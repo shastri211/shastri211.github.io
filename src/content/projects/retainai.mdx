@@ -1,0 +1,287 @@
+---
+title: RetainAI
+tagline: A churn-risk model on a public telecom dataset, validated with grouped cross-validation, calibration and ablations, and a written list of what the numbers cannot show.
+summary: Scores customers on churn risk with logistic regression, explains each score as an exact sum of feature contributions, estimates the revenue exposed, and audits behaviour across customer groups. Phase 1 is a command-line pipeline. Recommendations and a user interface are planned and not built.
+description: A churn-risk pipeline on the IBM Telco dataset with grouped cross-validation, calibration, ablations, exact linear explanations and a subgroup audit.
+kind: project
+status: validated
+statusNote: Phase 1 is complete and tested. It is a command-line pipeline with no user interface, API, LLM or agents. Recommendations, uplift modelling and outcome tracking are on the roadmap and not built.
+period:
+  start: 2026-07
+role: Sole author, 18 of 18 commits on main. July was the dataset and exploratory notebooks. The pipeline, tests and reports were committed on 6 October 2026.
+stack:
+  - group: Language and libraries
+    items: [Python 3.13, scikit-learn, pandas, NumPy, pydantic]
+  - group: Quality
+    items: [pytest, pinned dependencies, reproducible reports]
+links:
+  repo: https://github.com/shastri211/RetainAI
+pinned:
+  repo: shastri211/RetainAI
+  commit: 007387614e5ee381c364169d21e1df33c49e5a52
+order: 3
+metrics:
+  - label: Holdout ranking, shipped logistic regression
+    value: ROC-AUC 0.863, PR-AUC 0.684
+    source: reports/baseline_metrics.json
+    sourceUrl: https://github.com/shastri211/RetainAI/blob/007387614e5ee381c364169d21e1df33c49e5a52/reports/baseline_metrics.json
+    caveat: One holdout fold of 1,409 customers from a public sample of a fictional company, with no interval on this single split. Cross-validated ROC-AUC is 0.840 with a standard deviation of 0.013 over 15 folds, and fold deviations understate the real uncertainty because folds share training data.
+  - label: Calibration on the holdout
+    value: Expected calibration error 0.025
+    source: reports/baseline_metrics.json
+    sourceUrl: https://github.com/shastri211/RetainAI/blob/007387614e5ee381c364169d21e1df33c49e5a52/reports/baseline_metrics.json
+    caveat: Five equal-count bins of about 282 customers. The model under-predicts in the highest bin, with mean predicted risk 0.65 against an observed churn rate of 0.71.
+  - label: The floor, a model that predicts the base rate
+    value: ROC-AUC 0.500, PR-AUC 0.265
+    source: reports/baseline_metrics.json
+    sourceUrl: https://github.com/shastri211/RetainAI/blob/007387614e5ee381c364169d21e1df33c49e5a52/reports/baseline_metrics.json
+    caveat: This is the reference the real models are compared with, not a competing model.
+  - label: Contacting the top 10 percent of customers by score
+    value: Precision 0.787, recall 0.297, lift 2.97
+    source: reports/baseline_metrics.json
+    sourceUrl: https://github.com/shastri211/RetainAI/blob/007387614e5ee381c364169d21e1df33c49e5a52/reports/baseline_metrics.json
+    caveat: On the 1,409-customer holdout. Precision is the share of those customers who churned in this data. No intervention was applied, so it says nothing about how many could be retained.
+  - label: Automated tests
+    value: 142 test functions in 10 files
+    source: tests/
+    sourceUrl: https://github.com/shastri211/RetainAI/tree/007387614e5ee381c364169d21e1df33c49e5a52/tests
+    caveat: Counted from declarations at the pinned commit. The repository has no CI workflow yet, so the tests run locally only.
+evidence:
+  - claim: Reports carry the evaluation protocol, the model-selection rule, the limitations and a provenance label.
+    proof: reports/baseline_metrics.json
+    href: https://github.com/shastri211/RetainAI/blob/007387614e5ee381c364169d21e1df33c49e5a52/reports/baseline_metrics.json
+  - claim: Explanations are exact decompositions of the logistic regression's log-odds, and the module states what they are not.
+    proof: src/retainai/explain/linear.py, lines 1 to 21
+    href: https://github.com/shastri211/RetainAI/blob/007387614e5ee381c364169d21e1df33c49e5a52/src/retainai/explain/linear.py#L1-L21
+  - claim: The README lists what the project cannot do, including that it makes no recommendations and has no UI.
+    proof: README.md, lines 21 to 25
+    href: https://github.com/shastri211/RetainAI/blob/007387614e5ee381c364169d21e1df33c49e5a52/README.md#L21-L25
+  - claim: The subgroup audit states that it does not establish fairness or its absence.
+    proof: reports/fairness_audit.json
+    href: https://github.com/shastri211/RetainAI/blob/007387614e5ee381c364169d21e1df33c49e5a52/reports/fairness_audit.json
+  - claim: Revenue at risk is labelled as derived and assumed, not as customer lifetime value.
+    proof: reports/value_summary.json
+    href: https://github.com/shastri211/RetainAI/blob/007387614e5ee381c364169d21e1df33c49e5a52/reports/value_summary.json
+  - claim: Three over-stated Phase 0 findings were corrected after checking the data.
+    proof: docs/DECISIONS.md, D-18, and commit fefe4ae
+    href: https://github.com/shastri211/RetainAI/commit/fefe4ae
+  - claim: The data contract is validated, and violations make the command exit non-zero.
+    proof: src/retainai/data/validate.py
+    href: https://github.com/shastri211/RetainAI/blob/007387614e5ee381c364169d21e1df33c49e5a52/src/retainai/data/validate.py
+notClaimed:
+  - This is not a deployed system or a recommender. It is a command-line pipeline with no UI, API, LLM or agents. Recommendations, eligibility checks and outcome tracking are planned.
+  - Scores are not forecasts. The data is a single snapshot of a fictional company with no defined churn horizon, so a score is a dataset-specific churn probability.
+  - Explanations are model signal, not causes. Nothing here estimates the effect of any retention action.
+  - "Revenue-at-risk figures are proxies: risk times monthly revenue, with an assumed number of months. They are not lifetime value or margin."
+  - The subgroup audit does not establish fairness or its absence.
+  - The results say nothing about a real customer base.
+---
+
+import Section from '@/components/case-study/Section.astro';
+import Figure from '@/components/case-study/Figure.astro';
+import Note from '@/components/case-study/Note.astro';
+import Decision from '@/components/case-study/Decision.astro';
+import Metrics from '@/components/case-study/Metrics.astro';
+import EvidenceList from '@/components/case-study/EvidenceList.astro';
+import NotClaimed from '@/components/case-study/NotClaimed.astro';
+import Flow from '@/components/diagrams/Flow.astro';
+
+<Section id="context" title="Context">
+
+Customer churn is a standard prediction problem, and a standard way to overstate a result. A score is easy to produce. What a team can responsibly do with it depends on questions a leaderboard number does not answer. Is the probability calibrated? Are the reasons given for a score real or decorative? Does the data contain anything that could justify a recommendation?
+
+RetainAI starts from those questions. It is a retention decision-support project whose first phase is deliberately narrow: validate the data, train and compare baselines honestly, score customers, explain each score, size the revenue exposed, and audit how the model behaves across groups. The only dataset is the public IBM Telco Customer Churn sample of 7,043 customers, which IBM documents as data for a fictional company.
+
+</Section>
+
+<Section id="objective" title="Objective">
+
+Phase 1 had to produce a base that later phases could build on without having to revisit it.
+
+- A data contract that fails loudly and reports known issues instead of hiding them.
+- Baseline models compared under a protocol fixed in advance, with a rule for which one ships.
+- Scores that mean what they say, checked by calibration, and reasons tied exactly to what the model computed.
+- Every report labelled with what it cannot show.
+
+</Section>
+
+<Section id="approach" title="Approach">
+
+The work was committed one stage at a time, each as its own commit: product direction and roadmap, a preserved exploratory analysis, a reproducible environment, then data validation, feature engineering, baseline models, risk scoring, explanations, value proxy, subgroup audit, tests and documentation.
+
+<Figure label="Fig. 1" caption="The Phase 1 pipeline. Each stage writes a report to reports/ that carries its own limitations.">
+<Flow
+  label="RetainAI Phase 1 pipeline"
+  stages={[
+    {
+      title: 'Validate',
+      items: [
+        'Check the CSV against an explicit contract',
+        'Report known issues instead of dropping rows silently',
+        'Exit non-zero if the contract is violated',
+      ],
+    },
+    {
+      title: 'Compare',
+      items: [
+        '18 features; gender and senior citizen excluded',
+        'Prior baseline, logistic regression, random forest, gradient boosting',
+        'Repeated grouped cross-validation, 5 splits by 3 repeats',
+        'One holdout fold, untouched until the end',
+      ],
+    },
+    {
+      title: 'Select',
+      tone: 'gate',
+      items: [
+        'Ship the interpretable model unless a benchmark beats it by more than one fold deviation',
+        'The report flags the case for an owner decision',
+        'Nothing is switched silently',
+      ],
+    },
+    {
+      title: 'Score and explain',
+      items: [
+        'Risk score and band: LOW, MEDIUM or HIGH',
+        'Up to three model-grounded reasons',
+        'Revenue-at-risk proxy per customer and per band',
+      ],
+    },
+  ]}
+  bands={[
+    {
+      label: 'Audit',
+      text: 'Performance is reported by gender, senior citizen, partner and dependents, and feature ablations show what each group of features contributes.',
+    },
+    {
+      label: 'Provenance',
+      text: 'Every report records the dataset hash, the model version and a PUBLIC provenance label.',
+    },
+  ]}
+/>
+</Figure>
+
+</Section>
+
+<Section id="architecture" title="Architecture">
+
+A pip-installable Python package, `retainai`, with one subpackage per stage: `data`, `features`, `models`, `scoring`, `explain`, `value` and `fairness`, and a small command-line interface. The source is about 2,500 lines, with about 1,000 lines of design documents beside it: a product requirements document, an architecture, a roadmap, a data strategy and a numbered decision log.
+
+There is no service, database or user interface in this phase. The decision log records one Python package, no microservices and no queues for the planned later phases too, because no independent scaling or deployment need exists. The README adds that each later capability has to earn its place with evidence.
+
+</Section>
+
+<Section id="engineering" title="Engineering">
+
+### Splitting data without leaking duplicates
+
+The dataset contains duplicate customer rows. The duplicate groups all sit at a tenure of 1 month, where total charges equal monthly charges. Splits use `StratifiedGroupKFold` with the duplicate group as the group, so copies of one customer cannot land on both sides of a split. Cross-validation repeats 5 splits three times, giving 15 folds, on 5,634 development rows. The first fold of a separate grouped split is the 1,409-row holdout.
+
+### Choosing the model by a rule
+
+The report states the selection rule before it states the result. Gradient boosting scored best on cross-validated PR-AUC, ahead of logistic regression by 0.006. The standard deviation of that metric across folds was 0.020, so the benchmark did not clear one deviation and logistic regression shipped. Cross-validated ROC-AUC tells the same story: 0.840 for logistic regression, 0.841 for gradient boosting and 0.839 for the random forest.
+
+### Thresholds and bands
+
+The operating thresholds were fixed on development out-of-fold predictions before the holdout was read. The best-F1 threshold there was 0.29. Risk bands use cutoffs of 0.25 and 0.50, chosen from what a calibrated probability means, since 0.25 is about the base rate, and not tuned on outcomes. On the holdout, observed churn is 9.0 percent in LOW, 34.3 percent in MEDIUM and 70.2 percent in HIGH. The report says the bands are communication labels, not decision thresholds.
+
+### Explanations that add up
+
+For a logistic regression, the log-odds for a customer minus the log-odds of the average training profile equals the sum of each feature's weight times its distance from that average. Summing the encoded columns that come from one original feature gives that feature's contribution. The contributions add up exactly to what the model computed. Each explanation is labelled `MODEL_SIGNAL`, with a caveat that it is a pattern in the data and not a cause. Across the dataset, tenure moves the log-odds most, with a mean absolute contribution of 1.26, followed by total charges, contract type and monthly charges.
+
+### Reproducibility
+
+Runtime dependencies are pinned to exact versions. Reports record the dataset's SHA-256 after normalising line endings, and the model version. A slow test retrains on the real data and checks that the committed reports reproduce.
+
+</Section>
+
+<Section id="challenges" title="Challenges">
+
+<Note label="Correcting my own Phase 0 findings, 6 Oct 2026 (fefe4ae)">
+
+Checking the data properly in Phase 1 showed that three statements from the discovery phase were over-stated. Two-year contracts with fewer than 24 months of tenure are plausible, not inconsistent. The duplicate groups all sit at tenure 1, which explains them and makes them harmless to group. And a survival-based customer lifetime value cannot be validated on a single snapshot with an undefined churn horizon. The corrections are recorded as D-18 in the decision log instead of being edited out of the earlier documents.
+
+</Note>
+
+<Note label="A dataset that cannot support the obvious next step">
+
+The data has no treatments, offers, costs, dates or outcomes after an intervention. That rules out validating uplift, temporal validation and a real customer lifetime value, which are the things a retention product ultimately needs. The decision log handles it by sequencing: uplift moves to Phase 7 and is gated on a data-strategy decision, because it cannot be validated on this dataset. The planned MVP runs on assumed effects with no causal claims, and the value figures stay labelled as proxies until then.
+
+</Note>
+
+</Section>
+
+<Section id="trade-offs" title="Trade-offs">
+
+<Decision
+  title="Ship logistic regression"
+  chose="The logistic regression, by a written rule that prefers the interpretable model unless a benchmark clearly beats it."
+  over="Gradient boosting, which scored marginally higher on cross-validated PR-AUC."
+  because="The gap was less than a third of one fold deviation, and the linear model's explanations are exact."
+  cost="If a nonlinear model really is better, 7,043 rows are too few to show it, and the explanation method would have to change if the model did."
+/>
+
+<Decision
+  title="Exact decomposition instead of an explanation library"
+  chose="Weight times distance from the training mean, summed per original feature."
+  over="A general-purpose attribution method."
+  because="The contributions add up exactly to the model's own log-odds, so every explanation can be checked by arithmetic."
+  cost="It only works for a linear model, so it is tied to the choice above."
+/>
+
+<Decision
+  title="Keep gender and senior citizen out of the model"
+  chose="Treat them as audit-only attributes and report model behaviour by group."
+  over="Including them because they carry some signal."
+  because="Adding both changed cross-validated ROC-AUC by 0.0002, well inside its deviation of 0.001, so they were not buying accuracy."
+  cost="Excluding an attribute does not remove its proxies. The audit notes that tenure, partner and dependents may correlate with age."
+/>
+
+<Decision
+  title="Fix thresholds before reading the holdout"
+  chose="Choose operating thresholds on development out-of-fold predictions only."
+  over="Tuning them on the holdout for the best-looking figure."
+  because="A holdout used for tuning stops being a holdout."
+  cost="The holdout is one fold of 1,409 customers, so its metrics are noisy and are reported without an interval."
+/>
+
+<Decision
+  title="Bands from probability meaning, not from outcomes"
+  chose="Cutoffs of 0.25 and 0.50, from the base rate and from what more likely than not means."
+  over="Cutoffs tuned to maximise a metric."
+  because="A band is a label for people, and a label tuned on outcomes would quietly encode the dataset's quirks."
+  cost="The bands are unrelated to intervention capacity or cost, which the data cannot supply."
+/>
+
+</Section>
+
+<Section id="result" title="Result">
+
+A tested command-line pipeline that validates data, trains and compares four models under one protocol, scores customers, explains every score, sizes revenue exposure and audits subgroup behaviour, and writes a report for each stage. The figures below come from the committed reports.
+
+<Metrics items={frontmatter.metrics} />
+
+Contract type matters: removing it lowers cross-validated ROC-AUC by 0.006 in a paired comparison, and removing both contract and total charges lowers it by 0.007. That is evidence that those features carry signal in this dataset, not an explanation of why customers leave.
+
+</Section>
+
+<Section id="evidence" title="Evidence">
+
+Each claim links to the file at the pinned commit. The pinned commit is the code on the main branch, which is Phase 1.
+
+<EvidenceList items={frontmatter.evidence} />
+
+<NotClaimed items={frontmatter.notClaimed} />
+
+</Section>
+
+<Section id="reflection" title="Reflection">
+
+If I continued it today:
+
+- **Put the tests in CI.** 142 tests run only on my machine. A workflow that runs them, and the slow reproducibility test on a schedule, is the cheapest credibility gain available.
+- **Put intervals on the holdout.** The cross-validated figures have deviations; the holdout metrics are single numbers from one fold.
+- **Say which evidence tier each later phase will claim.** The roadmap's MVP runs on assumed effects, and uplift waits for a data-strategy decision. Writing that tier onto every output, as the Phase 1 reports already do with their provenance label, keeps assumed effects from being read as measured ones.
+- **Resolve the dataset's redistribution terms.** The sample is committed to the repository, and its terms and the repository's licence file are both unsettled.
+
+</Section>

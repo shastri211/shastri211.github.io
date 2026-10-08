@@ -1,0 +1,106 @@
+---
+title: RecruitAI, the web application
+tagline: The React frontends and the API layer for a screening and voice-interview pipeline built with a teammate. She wrote the pipeline; I wrote what recruiters and candidates use.
+summary: RecruitAI takes a job description and a batch of resumes through shortlisting, an interview invitation, a voice interview and a graded report. My part was the web application over the existing pipeline, which I added without modifying the pipeline's own code.
+description: A collaboration. I built the React frontends and the FastAPI layer over a teammate's screening and interview pipeline, and this page says exactly where the line falls.
+kind: collaboration
+status: prototype
+statusNote: A local prototype. The pipeline, the API and the frontends run together on a developer machine, with no hosted deployment.
+period:
+  start: 2026-09
+role: The web layer. Two React frontends and a FastAPI layer over the pipeline, in 8 pull requests, 7 merged, between 17 and 28 September 2026.
+collaborators:
+  - name: Aditi Bais
+    contribution: the screening and interview pipeline underneath, including resume filtering, LLM evaluation with resumable checkpoints, interview dispatch, post-call grading and the database. The repository is hers.
+stack:
+  - group: My part, frontends
+    items: [React 19, TypeScript, Vite, Tailwind CSS 4, React Router, TanStack Query, Radix UI]
+  - group: My part, API layer
+    items: [FastAPI, signed session tokens]
+  - group: The pipeline, my collaborator's
+    items: [Python, SQLite, Groq, local embeddings, Streamlit, Dograh voice interviews]
+links: {}
+order: 4
+evidence:
+  - claim: The API layer was added as new code that calls the same functions the existing dashboard already called, modifying no existing file.
+    proof: Pull request 1, "Add production frontend (React) and API layer", merged 17 September 2026
+  - claim: A second, isolated frontend was built alongside the first, with nine screens and a component kit over Radix primitives.
+    proof: Pull request 8, "Add frontend-v2", merged 28 September 2026
+  - claim: Expired sessions clear themselves and return the user to sign-in instead of leaving them stuck.
+    proof: Pull request 2, merged 18 September 2026
+  - claim: A candidate sees a generic "under process" message for 5 minutes after applying, then the real outcome.
+    proof: Pull request 6, merged 24 September 2026
+  - claim: Resubmitting a resume for the same job replaces the application instead of creating a duplicate.
+    proof: Pull request 4, merged 22 September 2026
+notClaimed:
+  - I did not build the screening pipeline, the interview dispatch, the grading or the database. Those are Aditi Bais's work.
+  - The pipeline's internals are not described here, because I did not write them.
+  - It is a local prototype. It is not deployed and has no users.
+---
+
+import Section from '@/components/case-study/Section.astro';
+import Note from '@/components/case-study/Note.astro';
+import EvidenceList from '@/components/case-study/EvidenceList.astro';
+import NotClaimed from '@/components/case-study/NotClaimed.astro';
+
+<Section id="context" title="Context">
+
+RecruitAI takes a job description and a batch of resumes through shortlisting, an interview invitation, a live voice interview and a graded report. Aditi Bais built that pipeline as Python modules that share one SQLite database, with a Streamlit dashboard for operators on top.
+
+My part was the web application on top of it: a dashboard for the recruiter and a self-service portal for the candidate, written as a React app.
+
+</Section>
+
+<Section id="approach" title="Approach">
+
+I worked under one constraint: leave the pipeline alone. The first pull request added two new top-level folders and modified no existing file. One was a thin FastAPI layer that calls the same database and pipeline functions the Streamlit dashboard already called. The other was a React frontend over that layer, covering the same functions plus a self-service portal for candidates.
+
+A later pull request added a second frontend, `frontend-v2`, beside the first instead of replacing it, so the working one stayed untouched while the new one was built.
+
+</Section>
+
+<Section id="engineering" title="Engineering">
+
+### The API layer
+
+Routers cover sign-in, job descriptions, candidates, reports, settings and the candidate portal, with a services module that calls the pipeline's own functions and a security module that issues signed session tokens. It is a thin layer: the pipeline's own functions do the work.
+
+### Frontend v2
+
+React 19 and TypeScript on Vite, with Tailwind CSS 4, React Router and TanStack Query for server state. A small component kit of about twenty pieces wraps Radix primitives: a table, dialog, drawer, tabs, timeline, score indicator and so on. A Vite proxy sends `/api` to the FastAPI service, so no backend or CORS change was needed. There are nine screens: sign-in, dashboard, jobs, job detail with bulk resume upload, candidates, candidate detail, reports, settings and the candidate portal. Every screen is wired to an existing endpoint, with nothing mocked.
+
+Two details from the pull request description. Pages that load data show a distinct error state with a retry, so a failed request is not presented as an empty list. Table rows and file-upload controls can be operated by keyboard, not only by pointer.
+
+The same description records one decision on purpose: business rules were carried over from the first frontend, not re-derived. Those are the structuring of job-description text, the parsing of interview transcripts into speaker turns, and the candidate portal's delayed reveal of the decision.
+
+### Behaviour that needed care
+
+- A 401 from the API clears the session and returns to sign-in.
+- Candidate-facing status text no longer claims an interview email was sent before the company has dispatched one.
+- A candidate who applies sees a generic "under process" message for five minutes before the real outcome appears.
+- Applying again to the same job with a different resume replaces the application.
+
+</Section>
+
+<Section id="result" title="Result">
+
+Two frontends and an API layer, all merged into the collaborator's repository, running locally against the pipeline. The verification recorded in the earlier pull requests was `tsc --noEmit`, a build, and a manual walkthrough of the candidate and recruiter flows against a running backend.
+
+</Section>
+
+<Section id="evidence" title="Evidence">
+
+The repository belongs to my collaborator and is not linked from this page. The pull requests below are the record of my part, and I am glad to walk through them.
+
+<EvidenceList items={frontmatter.evidence} />
+
+<NotClaimed items={frontmatter.notClaimed} />
+
+</Section>
+
+<Section id="reflection" title="Reflection">
+
+- **Test the API layer.** The verification in these pull requests was type checks, a build and a manual walkthrough. Tests for the routers would have caught regressions that a walkthrough only catches by luck.
+- **Retire one frontend.** Building `frontend-v2` beside the first was the safe way to change the interface, and it left two frontends to maintain. Once the new one reached parity, the first one should have gone.
+
+</Section>

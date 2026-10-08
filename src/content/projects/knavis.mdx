@@ -1,0 +1,330 @@
+---
+title: KNAVIS
+tagline: A document question-answering system built to say "I don't have enough evidence" when that is the right answer, with an evaluation suite that runs in CI.
+summary: Upload PDFs, Office files, spreadsheets, images or audio and ask questions in English, Hindi or Hinglish. Answers cite their sources and are checked sentence by sentence against the evidence. When the evidence is not good enough, the system abstains instead of guessing.
+description: An agentic RAG system with hybrid retrieval, an evidence gate, sentence-level answer verification, abstention and a 56-question evaluation that runs in CI.
+kind: flagship
+status: working
+statusNote: Runs locally with Docker Compose. CI passes on main, including a Docker smoke test. There is no hosted demo and no production user.
+period:
+  start: 2026-08
+role: Sole author in git. The first commit imports an existing 120-file codebase as-is; six pull requests over 2 and 3 October then added about 70 percent of the current code. Earlier prototypes, including a Streamlit version, are not in this repository.
+stack:
+  - group: Backend
+    items: [Python 3.13, FastAPI, SQLAlchemy 2, Alembic]
+  - group: Agent and retrieval
+    items: [LangGraph, SQLite FTS5 or PostgreSQL full-text search, Qdrant, NVIDIA embeddings]
+  - group: Models and services
+    items: ["Groq (answers, vision, speech-to-text)", Mistral and NVIDIA OCR, AssemblyAI]
+  - group: Frontend
+    items: [React 19, TypeScript, Vite]
+  - group: Delivery
+    items: [Docker Compose, nginx, GitHub Actions]
+links:
+  repo: https://github.com/shastri211/knavis
+pinned:
+  repo: shastri211/knavis
+  commit: c2a5d35272ab0e7ee68199ae2a1007ce5869cc26
+order: 2
+builtWith: This project was built with AI coding assistants; local branches and tooling folders in my working copy show it. The evaluation suite, the CI jobs and the written-up failed experiments are the record of how the result was checked.
+metrics:
+  - label: Second live evaluation run
+    value: 56 of 56 correct, 1 model call per answerable question, p50 2.9 s and p95 11.3 s
+    source: eval/README.md
+    sourceUrl: https://github.com/shastri211/knavis/blob/c2a5d35272ab0e7ee68199ae2a1007ce5869cc26/eval/README.md#L60
+    caveat: A small synthetic corpus, and the questions had been seen while tuning. This shows no regression, not accuracy on unseen documents. Model Groq gpt-oss-20b, NVIDIA embeddings, 41 model calls in total.
+  - label: First live evaluation run
+    value: 54 of 56 correct
+    source: eval/README.md
+    sourceUrl: https://github.com/shastri211/knavis/blob/c2a5d35272ab0e7ee68199ae2a1007ce5869cc26/eval/README.md#L60
+    caveat: One miss was a scoring bug (a no-break space) and one was a real mistake in generated SQL. After fixing both, the 27 re-run questions passed, which shows the fixes work but is not an accuracy figure.
+  - label: Offline evidence gate, unanswerable questions blocked
+    value: 6 of 8 (rate 0.75)
+    source: eval/baseline_offline.json
+    sourceUrl: https://github.com/shastri211/knavis/blob/c2a5d35272ab0e7ee68199ae2a1007ce5869cc26/eval/baseline_offline.json
+    caveat: Two look-alike questions get through the lexical gate. The model's instruction to abstain caught both in the live run, and a test asserts exactly these two leaks so they cannot change unnoticed.
+  - label: Automated tests
+    value: 395 test functions in 36 files, run in CI on SQLite and on PostgreSQL
+    source: backend/tests/
+    sourceUrl: https://github.com/shastri211/knavis/tree/c2a5d35272ab0e7ee68199ae2a1007ce5869cc26/backend/tests
+    caveat: Counted from test function declarations. I have not measured coverage.
+evidence:
+  - claim: The agent is a LangGraph state graph, from supervisor and guardrails to greeting, utility, document or blocked paths.
+    proof: backend/app/agent_graph/graph.py, lines 8 to 40
+    href: https://github.com/shastri211/knavis/blob/c2a5d35272ab0e7ee68199ae2a1007ce5869cc26/backend/app/agent_graph/graph.py#L8-L40
+  - claim: A chunk passes the evidence gate on dense similarity, on lexical coverage, or as an overview sample, and at most 8 reach the model.
+    proof: backend/app/grounding/evidence_gate.py, lines 16 to 62, and defaults in backend/app/config.py, line 19
+    href: https://github.com/shastri211/knavis/blob/c2a5d35272ab0e7ee68199ae2a1007ce5869cc26/backend/app/grounding/evidence_gate.py#L16-L62
+  - claim: Keyword and dense results are fused with reciprocal rank fusion, k = 60.
+    proof: backend/app/retrieval/rrf.py
+    href: https://github.com/shastri211/knavis/blob/c2a5d35272ab0e7ee68199ae2a1007ce5869cc26/backend/app/retrieval/rrf.py
+  - claim: If dense search is unavailable, retrieval falls back to keyword-only for 60 seconds.
+    proof: backend/app/integration/pipeline.py, line 26
+    href: https://github.com/shastri211/knavis/blob/c2a5d35272ab0e7ee68199ae2a1007ce5869cc26/backend/app/integration/pipeline.py#L26
+  - claim: Answer sentences are checked against their cited evidence, and a small share of failures is trimmed rather than discarding the answer.
+    proof: backend/app/agentic/verification.py, lines 24 to 34
+    href: https://github.com/shastri211/knavis/blob/c2a5d35272ab0e7ee68199ae2a1007ce5869cc26/backend/app/agentic/verification.py#L24-L34
+  - claim: Model-written SQL runs on a read-only connection under a SQLite authorizer, with a time limit and a row cap.
+    proof: backend/app/analytics/sqlguard.py, lines 107 to 178
+    href: https://github.com/shastri211/knavis/blob/c2a5d35272ab0e7ee68199ae2a1007ce5869cc26/backend/app/analytics/sqlguard.py#L107-L178
+  - claim: Chunks target 1,200 characters, never exceed 1,800 except a single table row, and overlap by 150 only when one paragraph is split.
+    proof: backend/app/ingest/chunker.py, lines 18 to 20
+    href: https://github.com/shastri211/knavis/blob/c2a5d35272ab0e7ee68199ae2a1007ce5869cc26/backend/app/ingest/chunker.py#L18-L20
+  - claim: The agent makes at most 2 retrieval calls and 3 sub-queries per question.
+    proof: backend/app/agentic/planner.py, lines 10 to 12
+    href: https://github.com/shastri211/knavis/blob/c2a5d35272ab0e7ee68199ae2a1007ce5869cc26/backend/app/agentic/planner.py#L10-L12
+  - claim: Five lexical variants of the gate were tried and none separated look-alike questions without breaking legitimate ones.
+    proof: eval/README.md from line 91, and eval/experiments/gate_variants.py
+    href: https://github.com/shastri211/knavis/blob/c2a5d35272ab0e7ee68199ae2a1007ce5869cc26/eval/README.md#L91
+  - claim: The evaluation set has 56 questions generated from code, with expected numbers recomputed independently.
+    proof: eval/README.md, lines 1 to 30, and eval/dataset.jsonl
+    href: https://github.com/shastri211/knavis/blob/c2a5d35272ab0e7ee68199ae2a1007ce5869cc26/eval/dataset.jsonl
+  - claim: A quadratic-time chunker was rewritten to run in linear time with identical output.
+    proof: commit 22f3f58
+    href: https://github.com/shastri211/knavis/commit/22f3f58
+  - claim: CI runs backend tests on SQLite and PostgreSQL, builds the frontend, and smoke-tests the Docker stack.
+    proof: .github/workflows/ci.yml
+    href: https://github.com/shastri211/knavis/blob/c2a5d35272ab0e7ee68199ae2a1007ce5869cc26/.github/workflows/ci.yml
+notClaimed:
+  - There is no reranking stage. Results are fused with reciprocal rank fusion and filtered by the evidence gate.
+  - Multimodal here means files are converted to text with a source, page or timestamp (OCR, figure descriptions, transcripts). There are no joint image and text embeddings.
+  - The evaluation uses a small synthetic corpus and questions that were seen while tuning. It is a regression gate, not a measure of accuracy on unseen documents.
+  - Scanned pages and audio are not covered by the evaluation, because they need paid OCR and transcription.
+  - Hindi and Hinglish are 9 of the 56 questions, too few to claim the system is strong in those languages.
+  - It is not deployed. It runs on one host with Docker Compose, with no hosted demo and no production user.
+---
+
+import Section from '@/components/case-study/Section.astro';
+import Figure from '@/components/case-study/Figure.astro';
+import Note from '@/components/case-study/Note.astro';
+import Decision from '@/components/case-study/Decision.astro';
+import Metrics from '@/components/case-study/Metrics.astro';
+import EvidenceList from '@/components/case-study/EvidenceList.astro';
+import NotClaimed from '@/components/case-study/NotClaimed.astro';
+import Flow from '@/components/diagrams/Flow.astro';
+
+<Section id="context" title="Context">
+
+Retrieval-augmented generation is easy to demo and hard to trust. The failure that matters is not a wrong answer to a question the documents cover. It is a confident answer to a question they do not.
+
+KNAVIS is a document question-answering application built around that failure. People sign in, upload documents (PDF, Word, PowerPoint, Excel and CSV, images, audio and subtitles) and ask questions in English, Hindi or Hinglish. The answer cites where it came from. If the documents do not support an answer, the system says so.
+
+</Section>
+
+<Section id="objective" title="Objective">
+
+Four properties, each tied to a test or a metric.
+
+- An answer cites evidence that exists, and its numbers appear in that evidence.
+- When the documents do not contain the answer, the system abstains.
+- An ordinary question costs one model call.
+- Every change is checked against a fixed question set in CI, offline and without paying for model calls.
+
+</Section>
+
+<Section id="approach" title="Approach">
+
+The repository was built in numbered phases, each merged by pull request with CI passing. After importing the existing project, Phase 0 fixed the core answering path and added end-to-end tests that fix its behaviour. Phase 1 added structured extraction and one-time chunking. Phase 2 added hosted OCR, figure descriptions and speech-to-text behind a quota governor. Phase 3 added spreadsheet analytics. Phase 4 added accounts, upload safety, the interface, Docker and the evaluation set. Phase 5 made jobs restart-safe and added PostgreSQL. Phase 6 limited embedding for huge documents and added object storage.
+
+At run time, a question goes through four steps: route it, retrieve candidates, decide whether the evidence is good enough, and answer with every sentence checked.
+
+<Figure label="Fig. 1" caption="The path of one document question, with the three concerns that cut across it. Drawn from the code at the pinned commit.">
+<Flow
+  label="KNAVIS question path"
+  stages={[
+    {
+      title: 'Route',
+      items: [
+        'Guardrails classify the message: greeting, utility, document question or blocked',
+        'Greetings, utilities and prompt-injection attempts are handled by rules, with no model call in the evaluation',
+      ],
+    },
+    {
+      title: 'Retrieve',
+      items: [
+        'Keyword search: SQLite FTS5 or PostgreSQL full-text',
+        'Dense search: Qdrant, filtered to the session',
+        'Fuse with reciprocal rank fusion',
+        'Dense search down: keyword-only for 60 s',
+      ],
+    },
+    {
+      title: 'Gate',
+      tone: 'gate',
+      items: [
+        'A chunk passes on dense cosine of at least 0.35, or on covering at least half the question’s content terms',
+        'At most 8 chunks go to the model',
+        'Not enough evidence: abstain',
+      ],
+    },
+    {
+      title: 'Answer and verify',
+      items: [
+        'One model call, with numbered evidence',
+        'Each sentence is checked against the evidence it cites',
+        'A small share of bad sentences is trimmed; otherwise abstain',
+      ],
+    },
+  ]}
+  bands={[
+    {
+      label: 'Spreadsheets',
+      text: 'A model writes one SELECT. A SQLite authorizer allows only known columns and functions, on a read-only connection with a time limit and a row cap. The answer is rendered from the returned rows.',
+    },
+    {
+      label: 'Ingestion',
+      text: 'PDF and Office files are read locally. Hosted OCR, figure descriptions and speech-to-text sit behind a quota governor that pauses work instead of failing.',
+    },
+    {
+      label: 'Languages',
+      text: 'A tokenizer and stopword list for Hindi and Hinglish, plus multilingual embeddings for cross-language questions.',
+    },
+  ]}
+/>
+</Figure>
+
+</Section>
+
+<Section id="architecture" title="Architecture">
+
+A React frontend is served by nginx, which proxies to a FastAPI application. The application runs a LangGraph state graph: a supervisor node feeds a guardrails node, which routes to a greeting, utility, document or blocked node. Every path ends after the routed node, so the graph is shallow, and the interesting work happens inside the document node.
+
+Storage is split by job. SQLAlchemy models, with Alembic migrations, hold accounts, chats, documents and jobs, on SQLite by default and on PostgreSQL in the overlays. Keyword search uses SQLite FTS5 or a PostgreSQL `tsvector` with a GIN index. Qdrant holds dense vectors in one shared collection, with every query filtered by session. Docker Compose has overlays for PostgreSQL, scaled workers with Redis, ClamAV scanning and object storage.
+
+</Section>
+
+<Section id="engineering" title="Engineering">
+
+### Hybrid retrieval and the evidence gate
+
+Keyword and dense results are fused with reciprocal rank fusion. The gate then judges each candidate on its own scale. BM25 scores are relative to the corpus and can be negative on a small one, while cosine similarities are bounded, so comparing both to one cutoff would be meaningless. A chunk is usable if its dense similarity reaches 0.35, or if it covers at least half of the question's content terms, or if it was sampled as a whole-document overview. Up to eight usable chunks go to the model. If none do, the system abstains without calling it.
+
+### Checking the answer without another model
+
+After the model answers, a local verifier splits the answer into sentences and checks each one. The citation must point at evidence that exists. Numbers in the sentence must appear in the cited text. At least 30 percent of its content words must appear there too. A sentence with no citation is accepted only if some chunk plainly contains it. If a citation points at the wrong chunk but the evidence as a whole supports the sentence, the citation is repaired. If at most 34 percent of the sentences fail, they are removed and the answer says so. Otherwise the system abstains.
+
+The 30 percent threshold is low on purpose, according to the code comment: it catches unrelated or invented statements, not paraphrases.
+
+### Bounded agent behaviour
+
+The agent can make at most two retrieval calls and three sub-queries per question. Decomposition is rule-based. A request to summarize skips similarity search and samples chunks across the documents instead.
+
+### Spreadsheet questions
+
+Totals, averages and "highest by group" do not fit retrieval, so a model writes one SQL query against the uploaded tables. The query must be a single `SELECT` or `WITH`. A SQLite authorizer then permits only the columns of the user's own tables and an allow-list of functions, and denies everything else, including `PRAGMA`, `ATTACH` and writes. The connection is read-only, has a progress handler that stops it at a deadline, and returns at most a fixed number of rows. The answer is rendered from the rows, with the columns used cited, not from model prose.
+
+### Chunking
+
+Chunks target 1,200 characters with a hard maximum of 1,800. Headings become a breadcrumb such as `Section: A > B`, table rows are split with their header repeated, spreadsheets cite real row numbers, and transcripts are grouped into 120 second windows.
+
+### Operating it
+
+Ingestion jobs resume after a restart and use leases so workers do not collide. New accounts can be required to confirm their email address with a single-use link, of which only a hash is stored. Uploads containing Office macros, embedded programs or PDF JavaScript are refused. Rate limits can use Redis, and ClamAV scanning is an optional overlay.
+
+</Section>
+
+<Section id="challenges" title="Challenges">
+
+<Note label="The gate that could not be tuned, 2 Oct 2026">
+
+Two unanswerable questions kept passing the lexical gate: "refund policy for enterprise customers" and "how many employees does Northwind Retail have". They looked like a threshold problem. `eval/experiments/gate_variants.py` tried the obvious fixes on the 24 answerable and 8 unanswerable questions that keyword search can reach.
+
+</Note>
+
+| Variant | Answerable kept | Unanswerable blocked | What it broke |
+| --- | --- | --- | --- |
+| Baseline, coverage at least 0.50 | 24 of 24 | 6 of 8 | |
+| Also ignore "long, many, much, often, per" | 24 of 24 | 6 of 8 | Nothing changed |
+| Coverage at least 0.60 | 22 of 24 | 7 of 8 | two legitimate questions |
+| IDF weighting, at least 0.45 | 22 of 24 | 6 of 8 | two legitimate questions |
+| Ignore words plus IDF, at least 0.50 | 21 of 24 | 7 of 8 | three legitimate questions |
+
+Every setting that blocked the refund question also blocked legitimate questions whose answers use different words, such as "support hours" against "9am to 6pm". Both look the same to a lexical check: one matching word and one missing word. The employee-count question could not be separated at all, because every one of its words occurs in the corpus. So the gate stayed as it was, and the model's instruction to abstain is the backstop. It held in 8 of 8 abstention questions in the live run. The next signal to try is the dense similarity of the best chunk.
+
+<Note label="Two misses in the first live run, 2 Oct 2026">
+
+The first live pass over 56 questions got 54 right. One miss was a scorer bug: the model wrote "9 am to 6 pm" with a narrow no-break space and the scorer wanted "9am". The answer was right, so the scorer now ignores whitespace. The other was a real mistake: asked for the "average clicks per campaign", the model grouped by the campaign id and returned one average per row. The SQL prompt now says that "per X", where each row is an X, means one figure over all rows.
+
+</Note>
+
+<Note label="A quadratic chunker, 2 Oct 2026 (22f3f58)">
+
+The splitter re-sliced the remaining text for every piece, so a paragraph with no sentence breaks took quadratic time, and a 40 MB file took minutes. It now walks an index. The commit message records that the output is identical to the old algorithm on thousands of random inputs, and a 20 MB file ingests in about 10 seconds.
+
+</Note>
+
+</Section>
+
+<Section id="trade-offs" title="Trade-offs">
+
+<Decision
+  title="Handle predictable messages with rules"
+  chose="Rules for greetings, thanks, capability questions, date and time, and prompt-injection attempts."
+  over="Sending every message through a model-based router."
+  because="One model call per answerable question was a stated target, and the second live run measured exactly that: 41 calls, one per answerable question."
+  cost="Rules cover only the phrasings anticipated. The routing and injection cases are 10 of the 56 evaluation questions, a small sample."
+/>
+
+<Decision
+  title="Leave the evidence gate alone"
+  chose="Keep the lexical gate and keep its two known leaks visible in the baseline."
+  over="Tuning thresholds until the offline numbers looked better."
+  because="Every variant that blocked the look-alike questions also blocked legitimate ones, as the table above shows."
+  cost="Two known cases depend on the model obeying its instruction to abstain. That held in the live run but is a softer guarantee than a gate."
+/>
+
+<Decision
+  title="Convert files to text with provenance"
+  chose="OCR, figure descriptions and transcripts become text chunks that carry a source, page, row or timestamp."
+  over="Joint image and text embeddings."
+  because="A citation needs a place to point, and keyword search can only index text."
+  cost="Visual information that OCR and captions drop is lost, the hosted services cost money, and scanned pages and audio are not in the evaluation."
+/>
+
+<Decision
+  title="Verify answers locally"
+  chose="Deterministic checks on citations, numbers and word overlap."
+  over="Asking a second model to grade the first one's answer."
+  because="It adds no model call, gives the same result every time, and can be unit-tested."
+  cost="Word overlap catches invented or unrelated sentences, not a plausible paraphrase that is wrong."
+/>
+
+<Decision
+  title="Let a model write SQL, behind an authorizer"
+  chose="A model-written single SELECT, validated and run under SQLite's authorizer."
+  over="Fixed query templates, or letting the model read the tables directly."
+  because="Spreadsheet questions such as totals, averages and highest-by-group do not fit retrieval, and templates would cover too few of them."
+  cost="Correctness depends on the model writing the right query. The first live run found a genuine mistake, fixed by a prompt rule rather than by construction."
+/>
+
+</Section>
+
+<Section id="result" title="Result">
+
+The application runs end to end locally, and its CI has five jobs: backend tests on SQLite, backend tests on PostgreSQL, a frontend build, a Docker smoke test through the proxy, and a Docker run with the object-storage overlay. The last three runs on main were green.
+
+<Metrics items={frontmatter.metrics} />
+
+</Section>
+
+<Section id="evidence" title="Evidence">
+
+Each claim links to the file and lines at the pinned commit.
+
+<EvidenceList items={frontmatter.evidence} />
+
+<NotClaimed items={frontmatter.notClaimed} />
+
+</Section>
+
+<Section id="reflection" title="Reflection">
+
+If I rebuilt it today:
+
+- **Try the dense score as a second gate signal.** It is the next thing the evaluation notes name, and it needs an embedding provider to test. It might separate the look-alike questions the lexical gate cannot.
+- **Add a real reranker, or stop listing one.** The pipeline fuses and gates but does not rerank. A cross-encoder would be a measurable change against the evaluation set.
+- **Evaluate on documents the system has not seen.** The corpus is synthetic and its questions were seen during tuning. A held-out set from real documents would turn the regression gate into a measure of accuracy.
+- **Grow the Hindi and Hinglish questions.** Nine of 56 is enough to catch a regression and too few to support a claim.
+- **Record a demo and capture screenshots.** There are none yet.
+
+</Section>

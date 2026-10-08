@@ -1,0 +1,332 @@
+---
+title: Hiring Automation
+tagline: A multi-tenant hiring tool that ranks batches of resumes, sends only the best matches to an LLM, and keeps working when a worker or a model provider fails.
+summary: Companies upload resumes in bulk. The system profiles and embeds them, ranks them against the job, and asks an LLM to evaluate only the candidates that pass an adaptive gate. Shortlisted candidates can get an email and a browser-based voice interview.
+description: A multi-tenant resume-screening platform with a Redis Streams worker, an adaptive semantic gate, LLM provider fallback and tenant-isolation tests.
+kind: flagship
+status: working
+statusNote: Runs locally with Docker Compose and passes CI on main. It is not deployed; there is no live demo and no production user.
+period:
+  start: 2026-09
+role: Sole maintainer of the repository, with 48 of the 49 commits on main. The first commit imports earlier work as one snapshot, so git cannot show how that part was written.
+collaborators:
+  - name: Ashish Choudhary
+    contribution: the backend and frontend directory split (PR 3), the one commit of theirs on main.
+stack:
+  - group: Backend
+    items: [Python 3.13, FastAPI, SQLAlchemy 2 (async), Alembic]
+  - group: Queue and data
+    items: [PostgreSQL 16, Redis Streams, Qdrant]
+  - group: Models
+    items: [Groq, Gemini, OpenRouter, NVIDIA, Gemini embeddings, local MiniLM embeddings]
+  - group: Frontend
+    items: [React 19, TypeScript, Vite, Tailwind CSS 4, TanStack Query]
+  - group: Delivery
+    items: [Docker Compose, nginx, GitHub Actions]
+links:
+  repo: https://github.com/shastri211/Hiring_Automation
+pinned:
+  repo: shastri211/Hiring_Automation
+  commit: d99bc2bb6794a173afbeb374ad628d1cae6273ff
+order: 1
+builtWith: This project was built with AI coding assistants, and the repository contains their configuration files. The commit history and the test suite are the record of what changed and how it was checked.
+metrics:
+  - label: Automated tests
+    value: 439 test functions in 45 files
+    source: backend/tests/
+    sourceUrl: https://github.com/shastri211/Hiring_Automation/tree/d99bc2bb6794a173afbeb374ad628d1cae6273ff/backend/tests
+    caveat: Counted from test function declarations. I have not measured coverage, so this shows how much testing exists, not how much of the code it exercises.
+  - label: Schema migrations
+    value: 34 Alembic revisions
+    source: backend/alembic/versions/
+    sourceUrl: https://github.com/shastri211/Hiring_Automation/tree/d99bc2bb6794a173afbeb374ad628d1cae6273ff/backend/alembic/versions
+    caveat: One of them introduces multi-tenancy. The count measures change history, not the size of the schema.
+  - label: Routes under the tenant-isolation check
+    value: More than 60
+    source: backend/tests/test_tenant_isolation.py
+    sourceUrl: https://github.com/shastri211/Hiring_Automation/blob/d99bc2bb6794a173afbeb374ad628d1cae6273ff/backend/tests/test_tenant_isolation.py#L333-L349
+    caveat: The test asserts that more than 60 routes are found and that each authenticated one has a cross-tenant case or a written exemption. It cannot prove a query nobody wrote a case for is scoped; a static detector for unscoped queries covers part of that gap.
+evidence:
+  - claim: The gate cuts at the largest gap between ranked semantic scores, within a floor and a ceiling.
+    proof: backend/app/services/screener.py, lines 21 to 74
+    href: https://github.com/shastri211/Hiring_Automation/blob/d99bc2bb6794a173afbeb374ad628d1cae6273ff/backend/app/services/screener.py#L21-L74
+  - claim: A worker heartbeat keeps a long job from looking idle, so another consumer does not reclaim it.
+    proof: backend/app/worker.py, lines 106 to 118
+    href: https://github.com/shastri211/Hiring_Automation/blob/d99bc2bb6794a173afbeb374ad628d1cae6273ff/backend/app/worker.py#L106-L118
+  - claim: The consumer reads new stream entries before its own pending backlog.
+    proof: backend/app/services/queue.py, lines 44 to 56, and commit c79e61d
+    href: https://github.com/shastri211/Hiring_Automation/commit/c79e61d
+  - claim: Rate limits and timeouts put a model on cooldown and the call falls through to the next provider.
+    proof: backend/app/services/llm_provider.py, lines 363 to 414
+    href: https://github.com/shastri211/Hiring_Automation/blob/d99bc2bb6794a173afbeb374ad628d1cae6273ff/backend/app/services/llm_provider.py#L363-L414
+  - claim: Each embedding model has its own Qdrant collection, so vectors from different models never mix.
+    proof: backend/app/services/model_registry.py, lines 65 to 95
+    href: https://github.com/shastri211/Hiring_Automation/blob/d99bc2bb6794a173afbeb374ad628d1cae6273ff/backend/app/services/model_registry.py#L65-L95
+  - claim: A new authenticated route cannot ship without a cross-tenant test case or an explicit exemption.
+    proof: backend/tests/test_tenant_isolation.py, lines 333 to 349
+    href: https://github.com/shastri211/Hiring_Automation/blob/d99bc2bb6794a173afbeb374ad628d1cae6273ff/backend/tests/test_tenant_isolation.py#L333-L349
+  - claim: A webhook from a superseded interview attempt is ignored.
+    proof: backend/app/services/interview.py, lines 266 to 312
+    href: https://github.com/shastri211/Hiring_Automation/blob/d99bc2bb6794a173afbeb374ad628d1cae6273ff/backend/app/services/interview.py#L266-L312
+  - claim: Zip uploads never use extractall and reject entries above a compression ratio of 100.
+    proof: backend/app/services/zip_ingest.py, lines 51 to 53
+    href: https://github.com/shastri211/Hiring_Automation/blob/d99bc2bb6794a173afbeb374ad628d1cae6273ff/backend/app/services/zip_ingest.py#L51-L53
+  - claim: Tests run against a separate Postgres schema and Redis database, with every model provider mocked.
+    proof: README.md, lines 74 to 84
+    href: https://github.com/shastri211/Hiring_Automation/blob/d99bc2bb6794a173afbeb374ad628d1cae6273ff/README.md#L74-L84
+notClaimed:
+  - It is not deployed. It runs locally with Docker Compose; there is no live demo and no production user.
+  - I have not measured throughput, latency, screening accuracy or time saved, so none are quoted.
+  - I have not compared its SHORTLIST, REVIEW and REJECT decisions with human reviewers, so I make no claim about their quality.
+  - The voice interview is an integration with Dograh, an open-source voice-agent platform. I did not build speech recognition, speech synthesis or the call engine.
+---
+
+import Section from '@/components/case-study/Section.astro';
+import Figure from '@/components/case-study/Figure.astro';
+import Note from '@/components/case-study/Note.astro';
+import Decision from '@/components/case-study/Decision.astro';
+import Metrics from '@/components/case-study/Metrics.astro';
+import EvidenceList from '@/components/case-study/EvidenceList.astro';
+import NotClaimed from '@/components/case-study/NotClaimed.astro';
+import Flow from '@/components/diagrams/Flow.astro';
+
+<Section id="context" title="Context">
+
+A company that opens a role to applicants can receive hundreds of resumes. Hiring Automation is a multi-tenant web application for that situation. Companies sign up, post jobs, and bring in resumes by bulk upload (PDF, DOCX or ZIP) or through a public apply link. The application profiles and ranks the resumes against each job, asks an LLM to evaluate the best matches, and can send shortlisted candidates an email and a browser-based voice interview.
+
+Two parts of that work are slow and fail in ordinary ways: reading and embedding hundreds of files, and calling LLM providers that rate-limit. A hiring tool also holds personal data for many companies at once. Most of the engineering here is about those three facts rather than about prompts.
+
+</Section>
+
+<Section id="objective" title="Objective">
+
+The system is built around four requirements.
+
+- A batch survives a worker crash. No resume is lost, and no resume is processed by two workers at once.
+- A company can read and write only its own data, and tests check that instead of convention.
+- Model spend and rate-limit exposure grow with the size of the shortlist, not with the number of resumes.
+- A provider outage or a malformed model response degrades the result instead of stopping the batch.
+
+</Section>
+
+<Section id="approach" title="Approach">
+
+Resume processing and screening are separate steps. Processing happens once per resume, in a background worker. Screening happens on demand, per job, and reads the stored profiles and vectors.
+
+Before any resume arrives, an LLM turns the job description into a structured profile, and the company's own keep-range and gap threshold are loaded for the gate.
+
+<Figure label="Fig. 1" caption="The four stages of the pipeline, and the three concerns that cut across them. Built from the code in the pinned commit, not from a design document.">
+<Flow
+  label="Hiring Automation pipeline"
+  stages={[
+    {
+      title: 'Ingest',
+      items: [
+        'Extract text, with OCR for image-only PDF pages',
+        'Profile locally; ask an LLM only when extraction is weak',
+        'Resolve candidate identity',
+        'Embed into Qdrant',
+      ],
+    },
+    {
+      title: 'Gate',
+      tone: 'gate',
+      items: [
+        'Rank every resume by semantic similarity to the job',
+        'Cut at the largest score gap, within a floor and a ceiling',
+        'The rest are marked PRE_SCREENED_OUT and keep their score',
+      ],
+    },
+    {
+      title: 'Evaluate',
+      items: [
+        'Only gate survivors reach the LLM',
+        'Structured output: SHORTLIST, REVIEW or REJECT, with a score and feedback',
+        'Falls through to the next provider on failure',
+      ],
+    },
+    {
+      title: 'Follow up',
+      items: [
+        'HR decision with an audit trail',
+        'Email templates and bulk outreach',
+        'Browser voice interview through Dograh',
+      ],
+    },
+  ]}
+  bands={[
+    {
+      label: 'Queue',
+      text: 'Redis Streams consumer group. Three retries at 60 s backoff, a 90 s heartbeat, stuck messages reclaimed after 300 s, and a sweep for uploads that were saved but never queued.',
+    },
+    {
+      label: 'Tenancy',
+      text: 'organization_id lives on root tables only; everything else is scoped through the job. A foreign ID returns the same 404 as a missing one.',
+    },
+    {
+      label: 'Providers',
+      text: 'Groq, Gemini, OpenRouter and NVIDIA in configured order. Rate limits and timeouts put a model on a 60 s cooldown.',
+    },
+  ]}
+/>
+</Figure>
+
+</Section>
+
+<Section id="architecture" title="Architecture">
+
+Three processes run from one repository: a FastAPI service, a queue worker (`python -m app.worker`) and a React frontend. In the container profile, a migration step runs first and nginx serves the frontend and proxies `/api`, so the API is not exposed directly.
+
+PostgreSQL is the system of record. Redis holds the job stream. Qdrant Cloud holds one collection per embedding model. Routes in `backend/app/api/` are thin, and the pipeline, screening, identity, email, interview and tenancy logic lives in `backend/app/services/`.
+
+The frontend is 30 page modules in React 19 and TypeScript, using TanStack Query for server state and Tailwind CSS 4 for styling.
+
+</Section>
+
+<Section id="engineering" title="Engineering">
+
+### The queue
+
+Resume processing runs on a Redis Streams consumer group. A message that fails is retried up to three times with a 60 second backoff. A worker sends a heartbeat every 90 seconds for the message it is processing; that re-claims the message onto the same consumer and resets its idle time. Without it, a job that legitimately runs longer than the 300 second idle threshold would look dead, and a second consumer would claim it while the first was still working. The stream is capped at 100,000 entries so acknowledged history cannot grow without bound.
+
+Uploads can also fail between "saved to disk" and "put on the stream". Each resume records when it was enqueued, and a recovery sweep re-queues any that never were.
+
+### The gate
+
+Sending every resume to an LLM costs one call per resume. The gate sorts resumes by semantic score, finds the largest drop between neighbouring scores, and cuts there if the drop is at least the company's threshold. If no drop is large enough, it keeps everything at or above the mean. The cut is then clamped between a minimum and a maximum number of candidates, both set per company.
+
+> Illustration, not real data. With scores of 0.81, 0.79, 0.77, 0.52 and 0.50, the largest drop is after 0.77, so three candidates go to the LLM and two are marked `PRE_SCREENED_OUT`.
+
+The function also guards against a misconfigured threshold. If it is zero or below, every gap ties at zero, no cut index is ever assigned, and the comparison still passes. The code keeps everyone instead of raising an error.
+
+### Provider fallback and embeddings
+
+`generate_with_fallback` walks the configured providers in order. A rate limit or a timeout puts that model on a 60 second cooldown and moves on. A configuration error skips the model without a cooldown. If every model is cooling down, it raises `LLMExhaustionError`, a different type from `InvalidEvaluationResultError`, which signals a malformed model response.
+
+Embeddings have two profiles: Gemini at 768 dimensions as the primary, and a local MiniLM model at 384 dimensions as a fallback. Each profile has its own Qdrant collection, and a job remembers which profile it was embedded with, so vectors from two models are never compared.
+
+### Tenant isolation
+
+`organization_id` is stored only on root tables, and everything else is scoped through the job. A request that names another company's object gets the same 404 as one that names an object that does not exist, so the API does not confirm that an ID is real. The isolation test file discovers every route in the application and fails if an authenticated route is neither covered by a cross-tenant case nor on a short, explicit exemption list. A second test is a static detector that flags new queries on root models that are not scoped.
+
+### Candidate identity
+
+An exact email match links a new resume to an existing candidate automatically. A phone-number match only files a suggestion for a human to review; it never merges on its own. Merges are reversible and logged.
+
+### Voice interviews
+
+Interviews use Dograh's browser widget. The application creates a one-time public link; the widget creates the call itself, so no outbound call is placed. Dograh reports results by webhook. Each interview records which attempt generation it is on, and a webhook from a superseded attempt is ignored. A periodic sweep marks interviews that never started as `NO_SHOW`, and that state is terminal and never retried automatically.
+
+### Also in the code
+
+Sign-in locks out after 5 failures per email or 50 per IP in a 15 minute window. Unknown emails count too, so the lockout does not reveal whether an account exists, and the email is hashed in the Redis key. If Redis is unreachable, sign-in fails open so a broken limiter cannot lock everyone out, while the anonymous signup and apply endpoints fail closed. Zip uploads never call `extractall`, and entries above a 100:1 compression ratio are rejected without being decompressed.
+
+</Section>
+
+<Section id="challenges" title="Challenges">
+
+These are bugs from the commit history, each with its cause and its fix.
+
+<Note label="Queue starvation, 15 Sep 2026 (c79e61d)">
+
+A message in retry backoff stayed in the consumer's pending list, and the consumer read that list first on every call. It never reached new entries, so new work stalled behind one failing message. The fix reads new entries first and the backlog second. A retry path needs its own test for what else is waiting while it retries.
+
+</Note>
+
+<Note label="Tests that passed for the wrong reason, 26 Sep 2026 (1970a3c)">
+
+The context sanitizer read two keys, `required_capabilities` and `preferred_capabilities`, that the job profile schema does not have. The real keys are `required_skills` and `preferred_skills`. As a result, certifications and languages were stripped from the evaluation even when the job description asked for them. The sanitizer's tests used the same non-existent keys, so they passed. The fix changed the fixtures to use the real profile shape and added a regression test.
+
+</Note>
+
+<Note label="Two embeddings for one job, 26 Sep 2026 (1970a3c)">
+
+Re-embedding a job under a new profile encoded the profile as JSON, while first-time processing encoded canonical text. That mixed two representations in one job's vectors. Both paths now call the same function for the embedding input.
+
+</Note>
+
+<Note label="Fallback profiles that could never be chosen, 26 Sep 2026 (1970a3c)">
+
+Two newer embedding profiles shared model names with older ones, and profiles are looked up by model name, so they could never be selected. All they did was make the fallback retry the same failing model twice. The fix removed them and added a test that profile model names are unique.
+
+</Note>
+
+Smaller fixes in the same commit: with no SMTP server configured, simulated emails were recorded as sent and are now recorded as simulated, and `/health` returns 503 when a dependency is down.
+
+</Section>
+
+<Section id="trade-offs" title="Trade-offs">
+
+<Decision
+  title="Gate on score gaps instead of a fixed top-N"
+  chose="Cut at the largest gap between ranked semantic scores, bounded by a per-company minimum and maximum."
+  over="Always sending the top N resumes to the LLM."
+  because="A fixed N makes the same number of LLM calls for five strong resumes as for five hundred weak ones. A gap-based cut follows the shape of the scores."
+  cost="Gap detection is only as good as the embedding scores. If they are poorly spread, the largest gap can be noise, and the bounds then hide that. The repository has no labelled data to tune the defaults against."
+/>
+
+<Decision
+  title="Profile locally first, and call an LLM only for weak extractions"
+  chose="Deterministic local profiling for every resume, with an LLM as a fallback."
+  over="An LLM profile for every resume."
+  because="Profiling runs for every uploaded file, so an LLM call there multiplies cost and rate-limit exposure by the number of resumes."
+  cost="Local extraction misses unusual layouts, and the definition of weak decides when the system pays for a better answer."
+/>
+
+<Decision
+  title="Redis Streams for the job queue"
+  chose="A Redis Streams consumer group, with my own retry, heartbeat and recovery code."
+  over="Polling a table in PostgreSQL, or adding a task framework."
+  because="Consumer groups already track delivery and pending entries and offer idle-claim, so the queue needs no service beyond Redis, which the sign-in lockout also uses."
+  cost="The retry bookkeeping, the heartbeat and the recovery sweep are application code, and the starvation bug above was in it."
+/>
+
+<Decision
+  title="Scope tenancy through the job"
+  chose="Store organization_id on root tables only and reach everything else through the job."
+  over="Putting organization_id on every table."
+  because="Fewer columns to keep consistent, and a child row cannot disagree with its parent."
+  cost="Every query must go through the job. A missed join is a data leak, which is why the route-coverage test and the static detector exist."
+/>
+
+<Decision
+  title="Integrate a voice platform instead of building speech"
+  chose="Dograh's browser widget, driven by a one-time link and webhooks."
+  over="A custom speech-to-text and text-to-speech pipeline."
+  because="A conversation engine is a separate problem from the hiring workflow, and Dograh already provides one as an open-source voice-agent platform."
+  cost="The conversation itself is configured in Dograh, outside this repository, so I cannot unit-test interview quality."
+/>
+
+</Section>
+
+<Section id="result" title="Result">
+
+The application covers the whole flow: sign up, create a job, bulk-upload resumes, watch the worker process them, screen, review decisions, send outreach and receive an interview result. CI runs the backend tests against PostgreSQL and Redis, checks that migrations match the models, and lints and builds the frontend.
+
+<Metrics items={frontmatter.metrics} />
+
+What does not exist yet is any measurement of how good the screening is. See the list under Evidence.
+
+</Section>
+
+<Section id="evidence" title="Evidence">
+
+Each claim below links to the file and lines at the pinned commit, so the links keep pointing at what I describe even after the repository changes.
+
+<EvidenceList items={frontmatter.evidence} />
+
+<NotClaimed items={frontmatter.notClaimed} />
+
+</Section>
+
+<Section id="reflection" title="Reflection">
+
+If I rebuilt it today:
+
+- **Classify provider errors by type, not by text.** The fallback decides whether an error is transient by checking whether the message contains the characters `50` or `400` (`llm_provider.py`, lines 400 to 404). A message that merely contains those digits would be misclassified. Provider exceptions should carry a status code.
+- **Share cooldown state.** Model cooldowns live in an in-process dictionary (`model_registry.py`, lines 30 and 31), so each worker process learns separately that a model is rate-limited. Redis would let them share it.
+- **Measure before tuning.** The gate defaults came from judgement. A small labelled set of resumes with human decisions would let me tune the threshold and report precision and recall, which is the number this project most needs.
+- **Write the architecture down.** The README explains how to run the project but not why it is shaped this way. This page is the first place that is written.
+- **Capture screenshots and a short demo.** None exist yet.
+
+</Section>
