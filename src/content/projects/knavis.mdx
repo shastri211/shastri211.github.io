@@ -1,6 +1,6 @@
 ---
 title: KNAVIS
-tagline: A document question-answering system built to say "I don't have enough evidence" when that is the right answer, with an evaluation suite that runs in CI.
+tagline: A document question-answering system built to say “I don’t have enough evidence” when that is the right answer, with an evaluation suite that runs in CI.
 summary: Upload PDFs, Office files, spreadsheets, images or audio and ask questions in English, Hindi or Hinglish. Answers cite their sources and are checked sentence by sentence against the evidence. When the evidence is not good enough, the system abstains instead of guessing.
 description: An agentic RAG system with hybrid retrieval, an evidence gate, sentence-level answer verification, abstention and a 56-question evaluation that runs in CI.
 kind: flagship
@@ -20,6 +20,7 @@ stack:
     items: [React 19, TypeScript, Vite]
   - group: Delivery
     items: [Docker Compose, nginx, GitHub Actions]
+highlights: [LangGraph, Qdrant, SQLite FTS5, FastAPI, React]
 links:
   repo: https://github.com/shastri211/knavis
 pinned:
@@ -29,10 +30,10 @@ order: 2
 builtWith: This project was built with AI coding assistants; local branches and tooling folders in my working copy show it. The evaluation suite, the CI jobs and the written-up failed experiments are the record of how the result was checked.
 metrics:
   - label: Second live evaluation run
-    value: 56 of 56 correct, 1 model call per answerable question, p50 2.9 s and p95 11.3 s
+    value: 56 of 56 correct
     source: eval/README.md
     sourceUrl: https://github.com/shastri211/knavis/blob/c2a5d35272ab0e7ee68199ae2a1007ce5869cc26/eval/README.md#L60
-    caveat: A small synthetic corpus, and the questions had been seen while tuning. This shows no regression, not accuracy on unseen documents. Model Groq gpt-oss-20b, NVIDIA embeddings, 41 model calls in total.
+    caveat: A small synthetic corpus, and the questions had been seen while tuning, so this shows no regression, not accuracy on unseen documents. One model call per answerable question, 41 in total, with latency p50 2.9 s and p95 11.3 s, on Groq gpt-oss-20b and NVIDIA embeddings.
   - label: First live evaluation run
     value: 54 of 56 correct
     source: eval/README.md

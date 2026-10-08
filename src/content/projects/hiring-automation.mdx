@@ -23,6 +23,7 @@ stack:
     items: [React 19, TypeScript, Vite, Tailwind CSS 4, TanStack Query]
   - group: Delivery
     items: [Docker Compose, nginx, GitHub Actions]
+highlights: [FastAPI, Redis Streams, Qdrant, React, PostgreSQL]
 links:
   repo: https://github.com/shastri211/Hiring_Automation
 pinned:
@@ -275,7 +276,7 @@ Smaller fixes in the same commit: with no SMTP server configured, simulated emai
 
 <Decision
   title="Redis Streams for the job queue"
-  chose="A Redis Streams consumer group, with my own retry, heartbeat and recovery code."
+  chose="A Redis Streams consumer group, with its own retry, heartbeat and recovery code."
   over="Polling a table in PostgreSQL, or adding a task framework."
   because="Consumer groups already track delivery and pending entries and offer idle-claim, so the queue needs no service beyond Redis, which the sign-in lockout also uses."
   cost="The retry bookkeeping, the heartbeat and the recovery sweep are application code, and the starvation bug above was in it."
@@ -294,7 +295,7 @@ Smaller fixes in the same commit: with no SMTP server configured, simulated emai
   chose="Dograh's browser widget, driven by a one-time link and webhooks."
   over="A custom speech-to-text and text-to-speech pipeline."
   because="A conversation engine is a separate problem from the hiring workflow, and Dograh already provides one as an open-source voice-agent platform."
-  cost="The conversation itself is configured in Dograh, outside this repository, so I cannot unit-test interview quality."
+  cost="The conversation itself is configured in Dograh, outside this repository, so interview quality cannot be unit-tested here."
 />
 
 </Section>

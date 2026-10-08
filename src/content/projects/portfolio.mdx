@@ -1,0 +1,228 @@
+---
+title: This portfolio
+tagline: "A static site whose build fails when a claim loses its evidence: typed content, pinned permalinks, no client-side framework."
+summary: A replacement for a template site. Content lives in typed collections that reject a metric with no caveat or a skill with no project, and a link checker confirms every code permalink still points at the lines it describes.
+description: "How this portfolio is built: typed content that rejects unsupported claims, link checks, accessibility and performance results, and what is untested."
+kind: meta
+status: working
+statusNote: It builds and passes its checks locally. It is not deployed yet, so every measurement below comes from a local preview of the production build.
+period:
+  start: 2026-10
+role: Owner of the content, the claims and the design decisions.
+stack:
+  - group: Framework
+    items: [Astro, TypeScript, MDX, zod content schemas]
+  - group: Presentation
+    items: [Plain CSS with custom properties, container queries, light-dark(), CSS view transitions]
+  - group: Checks
+    items: [axe-core, Lighthouse, a contrast script, a link checker]
+  - group: Delivery
+    items: [GitHub Actions, GitHub Pages]
+highlights: [Astro, TypeScript, MDX, CSS, axe-core]
+links:
+  repo: https://github.com/shastri211/shastri211.github.io
+order: 5
+metrics:
+  - label: Lighthouse, home page, mobile settings
+    value: 100 performance, 100 accessibility, 100 best practices, 100 SEO
+    source: Lighthouse run against astro preview of the production build
+    caveat: Lighthouse's default simulated mobile throttling against a local server, not the deployed site over a real network. The Hiring Automation case study scored 99 on performance and KNAVIS 100, with 100 on the other three categories for both.
+  - label: Weight of the home page
+    value: 83 KiB transferred in 6 requests, with no JavaScript files
+    source: Lighthouse network audit of the home page
+    caveat: Fonts are about 71 KiB of that. The Hiring Automation case study transfers 153 KiB and KNAVIS 104 KiB. Three small inline scripts, about 1 KB together, handle the theme toggle and contents highlighting.
+  - label: Layout shift and blocking time
+    value: Cumulative layout shift 0 on three pages, total blocking time 0 to 40 ms
+    source: Lighthouse, home page and two case-study pages
+    caveat: Lab measurements on a fast local machine with emulated throttling. Real devices will differ.
+  - label: Automated accessibility rules
+    value: 0 axe-core violations across 9 pages in light and dark themes
+    source: axe-core 4.14 with the WCAG 2.0, 2.1 and 2.2 A and AA tags and best-practice rules
+    caveat: Automated rules catch only part of what can go wrong. There has been no screen-reader or user testing.
+  - label: Text contrast
+    value: 9 text and background pairs, all at least 4.8 to 1 in both themes
+    source: scripts/check-contrast.mjs, read from the design tokens
+    caveat: Computed from the token values, so it cannot drift from the stylesheet. There is no text over images to check.
+  - label: Links
+    value: 55 external links resolve, including every GitHub line range
+    source: scripts/check-links.mjs against the production build
+    caveat: LinkedIn blocks bots and is not checked. The site's own canonical URLs can only be checked after deployment.
+evidence:
+  - claim: A metric without a real caveat, or a skill without a project, fails the content schema.
+    proof: src/content.config.ts
+  - claim: A case study missing a required section, or without a not-claimed list, fails the build.
+    proof: src/lib/case-study.ts
+  - claim: Each GitHub permalink is checked for existence, and its line range is checked against the file at the pinned commit.
+    proof: scripts/check-links.mjs
+  - claim: Colour contrast is computed from the same tokens the stylesheet uses.
+    proof: scripts/check-contrast.mjs and src/styles/tokens.css
+  - claim: The theme is applied before first paint, so there is no flash of the wrong theme.
+    proof: the inline script in src/layouts/BaseLayout.astro
+notClaimed:
+  - It is not deployed yet. Every measurement was taken on a local preview of the production build.
+  - Automated checks and a keyboard review are not the same as testing with people who use assistive technology. That has not been done.
+  - Mobile layouts were checked in emulation at 375, 768 and 1280 pixels, not on physical phones.
+  - The case studies contain no screenshots of the running applications, because none exist yet. They use diagrams built from the code.
+---
+
+import Section from '@/components/case-study/Section.astro';
+import Note from '@/components/case-study/Note.astro';
+import Decision from '@/components/case-study/Decision.astro';
+import Metrics from '@/components/case-study/Metrics.astro';
+import EvidenceList from '@/components/case-study/EvidenceList.astro';
+import NotClaimed from '@/components/case-study/NotClaimed.astro';
+
+<Section id="context" title="Context">
+
+The previous site was a lightly edited template. It showed self-rated skill percentages, linked three course assignments, published a personal phone number in the page source, and listed an email address with a typo. None of it could be checked, and none of it showed the work that now exists on GitHub.
+
+The replacement had one job: for every claim on it, a visitor should be able to see how they would know.
+
+</Section>
+
+<Section id="objective" title="Objective">
+
+- A recruiter should understand who this is, what they build and where the code is within thirty seconds.
+- A technical reader should find enough depth in the case studies to ask real questions.
+- No number appears without its source and its limits.
+- The site should be fast and accessible by construction, not by a final polish pass.
+- Content should be editable without touching components.
+
+</Section>
+
+<Section id="approach" title="Approach">
+
+The site is treated as a publication with an editor, and the build is the editor. The content model decides what can be said, and the build refuses to publish what the model rejects. Visual design stays out of the way: one serif for reading, one monospace for metadata, a warm paper background, ink text and a single accent colour used for numbers, focus and the one decision stage in each diagram.
+
+</Section>
+
+<Section id="architecture" title="Architecture">
+
+Astro builds static HTML. Projects are MDX files with typed frontmatter. Skills, experience and certifications are JSON collections validated by zod schemas, and skills hold references to project entries, so a reference to a project that does not exist fails at build time. A few typed data modules hold identity, links and the journey. Layouts and components are `.astro` files with scoped styles, and the design tokens live in one stylesheet.
+
+The home page reads recent commits from the GitHub API during the production build, with a committed snapshot as the fallback. Deployment is a GitHub Actions workflow to GitHub Pages.
+
+</Section>
+
+<Section id="engineering" title="Engineering">
+
+### Content that cannot overclaim
+
+A metric needs a label, a value, a source and a caveat of real length. A skill needs at least one project that used it. A case study needs every required section for its kind, plus a list of what is not claimed. These rules live in the schema and in a build-time check, so they apply to every future edit and not only to the first draft.
+
+### Evidence that stays true
+
+Code links point at a commit, not at a branch, so they keep describing what the text says. The link checker goes one step further for GitHub line ranges: it fetches the file at that commit and confirms it has that many lines.
+
+### Type and layout
+
+Two families, Newsreader and IBM Plex Mono, self-hosted as Latin-only files. The page shell is a twelve-column grid with a narrow rail for metadata and a main column for reading, and diagrams and tables are allowed to break out of the reading measure. Colours are defined once with `light-dark()`, so the theme toggle only changes the colour scheme.
+
+### Motion
+
+Page transitions use the browser's cross-document view transitions, and sections fade in with a scroll-driven animation. Both are plain CSS, both are off under `prefers-reduced-motion`, and neither needs JavaScript.
+
+### Diagrams
+
+Architecture diagrams are real HTML lists styled as a staged flow, not images. The text stays selectable, scales with the reader's font size, and stacks into one column on a narrow screen.
+
+</Section>
+
+<Section id="challenges" title="Challenges">
+
+<Note label="Claims that did not survive checking">
+
+Content review caught several things before they reached the page. An early audit quoted RetainAI figures from an unpushed branch, and the report that a visitor can actually open has different numbers: holdout ROC-AUC 0.863, not 0.849. An architecture document in KNAVIS lists a reranking step that the code does not have. A resume line about Hugging Face translation had no matching code. Each was removed or corrected to match the evidence.
+
+</Note>
+
+<Note label="Verification links that required a login">
+
+The link checker found that both IBM certificate links redirect an anonymous visitor to a sign-in page. A link labelled "Verify" that cannot be used to verify is worse than no link, so they were removed.
+
+</Note>
+
+<Note label="A test that reported a failure that did not exist">
+
+The first accessibility run, in the browser's dark theme, was clean. A second run in light theme reported hundreds of contrast failures, with dark-theme ink on a light background. The cause was the test, not the page: flipping the theme after load started colour transitions that never advanced in a hidden frame. Setting the theme before load removed the artefact, and all eighteen runs were then clean.
+
+</Note>
+
+<Note label="Smaller ones">
+
+The list styles meant for prose were leaking into the diagram components and shifting their columns, which was fixed by scoping them to direct children. A colon inside an unquoted YAML list item silently became an object, and the schema rejected it with a clear error. The development server cached an old content schema until it was restarted.
+
+</Note>
+
+</Section>
+
+<Section id="trade-offs" title="Trade-offs">
+
+<Decision
+  title="A static site generator, not a React application"
+  chose="Astro with typed content collections and no client-side framework."
+  over="A React single-page app or a Next.js export."
+  because="The site is mostly reading. Static HTML is fast, works without JavaScript and is easy to index."
+  cost="Anything interactive has to be written by hand, and the component model differs from the React used in the projects."
+/>
+
+<Decision
+  title="Hand-written CSS over a utility framework"
+  chose="Design tokens in custom properties and scoped styles per component."
+  over="Tailwind CSS."
+  because="The whole stylesheet is 18 KiB, the tokens have one definition, and there is no build dependency to maintain."
+  cost="More CSS to write and review, and no shared vocabulary with the Tailwind projects."
+/>
+
+<Decision
+  title="Diagrams as HTML"
+  chose="Staged flows built from lists and styled with CSS."
+  over="SVG or exported images."
+  because="They stay readable at any width, can be selected and searched, and cannot drift out of date behind a binary file."
+  cost="Graph-like layouts with arbitrary arrows are hard to express, so every diagram is a left-to-right flow."
+/>
+
+<Decision
+  title="GitHub data at build time"
+  chose="Read recent commits during the production build, with a committed snapshot as the fallback."
+  over="Calling the GitHub API from the visitor's browser."
+  because="No token or rate limit is exposed to visitors, and a failed request cannot break the page."
+  cost="The activity list is only as fresh as the last deploy, so a scheduled rebuild is needed."
+/>
+
+<Decision
+  title="No contact form"
+  chose="An email address and links."
+  over="A form with a backend."
+  because="There is no business reason for a backend, and a form adds a spam target and a failure mode."
+  cost="Mail goes through the visitor's own mail client."
+/>
+
+</Section>
+
+<Section id="result" title="Result">
+
+Nine pages, built as static HTML, with every check passing locally. The results below are measured, with their limits attached.
+
+<Metrics items={frontmatter.metrics} />
+
+</Section>
+
+<Section id="evidence" title="Evidence">
+
+The source files below are the evidence for the claims in this case study. Once the repository is published, each one becomes a permalink.
+
+<EvidenceList items={frontmatter.evidence} />
+
+<NotClaimed items={frontmatter.notClaimed} />
+
+</Section>
+
+<Section id="reflection" title="Reflection">
+
+- **Capture the running applications.** The case studies are diagrams and prose because no screenshots exist. A short capture of each application working would be the strongest missing piece of evidence.
+- **Add the checks to CI.** Contrast, links and the build run by hand today. A workflow should run them on every push, with the link check on a schedule so a dead link is found before a reader finds it.
+- **Test with a screen reader.** Automated tools found nothing, which is the point at which a person should start.
+- **Generate a social card for each case study.** There is one site-wide card today.
+
+</Section>
