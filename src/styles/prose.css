@@ -19,13 +19,13 @@
   max-width: none;
 }
 
-.prose h3 {
+.prose > h3 {
   margin-top: 2em;
   font-size: var(--step-1);
   font-weight: 500;
 }
 
-.prose h3 + * {
+.prose > h3 + * {
   margin-top: var(--s-3);
 }
 
@@ -33,21 +33,24 @@
   font-weight: 600;
 }
 
-.prose ul,
-.prose ol {
+/* Direct children only, so lists inside components (diagrams, evidence) keep their own layout. */
+.prose > ul,
+.prose > ol {
   padding-left: 1.25em;
 }
 
-.prose li + li {
+.prose > ul > li + li,
+.prose > ol > li + li {
   margin-top: 0.4em;
 }
 
-.prose li::marker {
+.prose > ul > li::marker,
+.prose > ol > li::marker {
   color: var(--ink-3);
 }
 
 .prose :not(pre) > code {
-  padding: 0.08em 0.3em;
+  padding: 0.08em 0.2em;
   border-radius: 2px;
   background: var(--paper-2);
   font-size: 0.82em;

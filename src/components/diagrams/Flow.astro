@@ -32,7 +32,7 @@ const { label, stages, bands = [] } = Astro.props;
         <span class="step label" aria-hidden="true">
           {String(i + 1).padStart(2, '0')}
         </span>
-        <h4>{stage.title}</h4>
+        <h3>{stage.title}</h3>
         <ul>
           {stage.items.map((item) => (
             <li>{item}</li>
@@ -89,7 +89,7 @@ const { label, stages, bands = [] } = Astro.props;
     color: var(--accent);
   }
 
-  h4 {
+  h3 {
     font-size: var(--step-1);
     font-weight: 500;
     line-height: 1.2;
