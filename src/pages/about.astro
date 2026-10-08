@@ -1,0 +1,300 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { education } from '@/data/profile';
+import { site } from '@/data/site';
+import { formatMonth } from '@/lib/case-study';
+
+const projects = new Map((await getCollection('projects')).map((p) => [p.id, p.data.title]));
+const experience = await getCollection('experience');
+const certifications = (await getCollection('certifications')).sort((a, b) =>
+  b.data.issued.localeCompare(a.data.issued),
+);
+const skills = await getCollection('skills');
+
+const groups = new Map<string, typeof skills>();
+for (const s of skills) groups.set(s.data.group, [...(groups.get(s.data.group) ?? []), s]);
+
+const longDate = new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
+---
+
+<BaseLayout
+  title={`About | ${site.name}`}
+  description="Background, experience, education, certifications and the projects behind each skill."
+  path="/about/"
+>
+  <header class="wrap grid head">
+    <p class="col-rail label label--caps kicker">About</p>
+    <div class="col-main">
+      <h1>Student, intern, and a habit of writing down what failed.</h1>
+    </div>
+  </header>
+
+  <section class="wrap grid block" aria-labelledby="story-title">
+    <h2 id="story-title" class="col-rail label label--caps">
+      Story
+    </h2>
+    <div class="col-main prose-about">
+      <p>
+        I am due to finish an M.Tech (Integrated) in Information Technology at IIPS, Indore, in
+        2027, and I have been an AI intern at Onetab AI since August 2026. I started with Python and
+        SQL coursework. My first portfolio was a template with three data-preparation assignments
+        and skill bars I had given myself.
+      </p>
+      <p>
+        The first conversational system I built was Sahaay, a rule-based Flask chatbot for English,
+        Hindi and Hinglish conversations. It was never published, so it has no case study here.
+      </p>
+      <p>
+        From August 2026 the projects became systems: a retrieval prototype that was later rebuilt
+        with hybrid search, a multi-tenant hiring platform, a document question-answering system,
+        and a churn model. What I have documented most carefully across them is where they fail.
+        Each case study has a list of what I do not claim. KNAVIS records a gate experiment that did
+        not work, and RetainAI records corrections to its own earlier findings.
+      </p>
+      <p>
+        I am looking for backend and AI-engineering roles and internships where reliable pipelines
+        around language models are the job. Each case study ends with what I would change.
+      </p>
+    </div>
+  </section>
+
+  <section class="wrap grid block" aria-labelledby="exp-title">
+    <h2 id="exp-title" class="col-rail label label--caps">
+      Experience
+    </h2>
+    <div class="col-main">
+      {experience.map((e) => (
+        <article class="job">
+          <h3>
+            {e.data.role}, {e.data.organization}
+          </h3>
+          <p class="label">
+            {formatMonth(e.data.start)} – {e.data.end ? formatMonth(e.data.end) : 'present'}
+          </p>
+          <p class="sum">{e.data.summary}</p>
+          <ul>
+            {e.data.work.map((w) => (
+              <li>{w}</li>
+            ))}
+          </ul>
+          {e.data.stack.length > 0 && <p class="label">{e.data.stack.join(' · ')}</p>}
+          {e.data.note && <p class="fine">{e.data.note}</p>}
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="wrap grid block" aria-labelledby="edu-title">
+    <h2 id="edu-title" class="col-rail label label--caps">
+      Education
+    </h2>
+    <ul class="col-main plain">
+      {education.map((e) => (
+        <li>
+          <span class="label">{e.years}</span>
+          <span>
+            <strong>{e.programme}</strong>
+            <br />
+            {e.institution}
+          </span>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="wrap grid block" aria-labelledby="cert-title">
+    <h2 id="cert-title" class="col-rail label label--caps">
+      Certifications
+    </h2>
+    <ul class="col-main plain">
+      {certifications.map((c) => (
+        <li>
+          <span class="label">{longDate.format(new Date(c.data.issued))}</span>
+          <span>
+            <strong>{c.data.title}</strong>
+            <br />
+            {c.data.issuer}
+            {c.data.verifyUrl && (
+              <>
+                {' · '}
+                <a href={c.data.verifyUrl} rel="noopener">
+                  Verify <Icon name="arrow-up-right" size={11} />
+                </a>
+              </>
+            )}
+            {c.data.note && <span class="fine">{c.data.note}</span>}
+          </span>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="wrap grid block" id="skills" aria-labelledby="skills-title">
+    <h2 id="skills-title" class="col-rail label label--caps">
+      Skills, with evidence
+    </h2>
+    <div class="col-main">
+      <p class="intro">
+        A technology is listed only if a project on this site used it, and the projects are linked.
+        There are no ratings.
+      </p>
+      {[...groups.entries()].map(([group, items]) => (
+        <section class="sk-group" aria-label={group}>
+          <h3 class="label label--caps">{group}</h3>
+          <ul>
+            {items.map((s) => (
+              <li>
+                <span class="name">{s.data.name}</span>
+                <span class="used label">
+                  {s.data.usedIn.map((ref, i) => (
+                    <>
+                      {i > 0 && ', '}
+                      <a href={`/work/${ref.id}/`}>{projects.get(ref.id) ?? ref.id}</a>
+                    </>
+                  ))}
+                </span>
+                {s.data.note && <span class="fine">{s.data.note}</span>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .head {
+    padding-top: var(--s-8);
+    padding-bottom: var(--s-6);
+    row-gap: var(--s-4);
+  }
+
+  .kicker {
+    padding-top: 0.7rem;
+  }
+
+  h1 {
+    max-width: 20ch;
+    font-size: var(--step-4);
+    letter-spacing: -0.02em;
+  }
+
+  .block {
+    padding-block: var(--s-7);
+    border-top: 1px solid var(--rule-strong);
+    row-gap: var(--s-4);
+  }
+
+  .block > h2 {
+    padding-top: 0.2rem;
+  }
+
+  .prose-about {
+    display: grid;
+    gap: var(--s-4);
+    max-width: var(--measure);
+    font-size: var(--step-1);
+    line-height: 1.55;
+  }
+
+  .job h3 {
+    font-size: var(--step-2);
+    font-weight: 450;
+  }
+
+  .job .label {
+    margin-top: var(--s-1);
+  }
+
+  .job .sum {
+    margin-top: var(--s-4);
+    max-width: var(--measure);
+    color: var(--ink-2);
+  }
+
+  .job ul {
+    margin: var(--s-3) 0 var(--s-4);
+    padding-left: 1.2em;
+    max-width: var(--measure);
+  }
+
+  .job li + li {
+    margin-top: var(--s-2);
+  }
+
+  .fine {
+    display: block;
+    margin-top: var(--s-2);
+    max-width: 62ch;
+    font-size: 0.9375rem;
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+
+  .plain {
+    list-style: none;
+    border-top: 1px solid var(--rule);
+  }
+
+  .plain li {
+    display: grid;
+    gap: var(--s-1) var(--gap);
+    padding-block: var(--s-4);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  @media (min-width: 40rem) {
+    .plain li {
+      grid-template-columns: 9rem minmax(0, 1fr);
+    }
+    .plain .label {
+      padding-top: 0.3rem;
+    }
+  }
+
+  .intro {
+    max-width: 56ch;
+    margin-bottom: var(--s-5);
+    color: var(--ink-2);
+  }
+
+  .sk-group {
+    margin-top: var(--s-6);
+  }
+
+  .sk-group h3 {
+    padding-bottom: var(--s-2);
+    border-bottom: 1px solid var(--rule-strong);
+  }
+
+  .sk-group ul {
+    list-style: none;
+  }
+
+  .sk-group li {
+    display: grid;
+    gap: var(--s-1) var(--gap);
+    padding-block: var(--s-3);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .sk-group .fine {
+    grid-column: 1 / -1;
+    margin-top: 0;
+  }
+
+  @media (min-width: 48rem) {
+    .sk-group li {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+      align-items: baseline;
+    }
+  }
+</style>

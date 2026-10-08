@@ -1,0 +1,42 @@
+[
+  {
+    "id": "be10x-ai-career-accelerator",
+    "title": "Certified AI-Driven Professional, AI Career Accelerator Inner Circle Program",
+    "issuer": "Be10x",
+    "issued": "2026-01-23",
+    "kind": "program",
+    "note": "A prompt-engineering and AI-tooling programme. It shows I completed it; it says little about engineering depth, which the case studies cover."
+  },
+  {
+    "id": "ibm-getting-started-with-data",
+    "title": "Getting Started with Data",
+    "issuer": "IBM SkillsBuild",
+    "issued": "2026-01-29",
+    "kind": "course",
+    "verifyUrl": "https://skills.yourlearning.ibm.com/certificate/PLAN-14F2691E3A32"
+  },
+  {
+    "id": "deloitte-data-analytics",
+    "title": "Data Analytics Job Simulation",
+    "issuer": "Deloitte Australia, via Forage",
+    "issued": "2026-02-03",
+    "kind": "job-simulation",
+    "note": "Data analysis and forensic technology tasks."
+  },
+  {
+    "id": "ibm-data-fundamentals",
+    "title": "Data Fundamentals",
+    "issuer": "IBM SkillsBuild",
+    "issued": "2026-02-13",
+    "kind": "course",
+    "verifyUrl": "https://skills.yourlearning.ibm.com/certificate/PLAN-BC0FAEE8E439"
+  },
+  {
+    "id": "bcg-x-data-for-decision-makers",
+    "title": "Introduction to Data for Decision Makers Job Simulation",
+    "issuer": "BCG X, via Forage",
+    "issued": "2026-02-16",
+    "kind": "job-simulation",
+    "note": "Campaign performance analysis and communicating findings."
+  }
+]

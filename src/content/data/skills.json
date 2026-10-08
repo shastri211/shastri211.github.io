@@ -1,0 +1,177 @@
+[
+  {
+    "id": "python",
+    "name": "Python",
+    "group": "Languages",
+    "usedIn": ["hiring-automation", "knavis", "retainai"]
+  },
+  {
+    "id": "typescript",
+    "name": "TypeScript",
+    "group": "Languages",
+    "usedIn": ["hiring-automation", "knavis", "recruitai"]
+  },
+  { "id": "sql", "name": "SQL", "group": "Languages", "usedIn": ["hiring-automation", "knavis"] },
+
+  {
+    "id": "fastapi",
+    "name": "FastAPI",
+    "group": "Backend",
+    "usedIn": ["hiring-automation", "knavis", "recruitai"]
+  },
+  {
+    "id": "sqlalchemy",
+    "name": "SQLAlchemy and Alembic",
+    "group": "Backend",
+    "usedIn": ["hiring-automation", "knavis"]
+  },
+  {
+    "id": "async-python",
+    "name": "Asynchronous Python",
+    "group": "Backend",
+    "usedIn": ["hiring-automation"]
+  },
+  {
+    "id": "redis-streams",
+    "name": "Redis Streams workers",
+    "group": "Backend",
+    "usedIn": ["hiring-automation"],
+    "note": "Consumer group with retries, a heartbeat and recovery sweeps."
+  },
+  {
+    "id": "auth",
+    "name": "Authentication and rate limiting",
+    "group": "Backend",
+    "usedIn": ["hiring-automation", "knavis"]
+  },
+  {
+    "id": "tenancy",
+    "name": "Multi-tenant data isolation",
+    "group": "Backend",
+    "usedIn": ["hiring-automation"]
+  },
+  {
+    "id": "pytest",
+    "name": "pytest",
+    "group": "Backend",
+    "usedIn": ["hiring-automation", "knavis", "retainai"]
+  },
+
+  {
+    "id": "hybrid-retrieval",
+    "name": "Hybrid retrieval (keyword plus dense, rank fusion)",
+    "group": "Retrieval and LLM systems",
+    "usedIn": ["knavis"]
+  },
+  {
+    "id": "langgraph",
+    "name": "LangGraph",
+    "group": "Retrieval and LLM systems",
+    "usedIn": ["knavis"]
+  },
+  {
+    "id": "llm-fallback",
+    "name": "LLM provider fallback and cooldowns",
+    "group": "Retrieval and LLM systems",
+    "usedIn": ["hiring-automation"]
+  },
+  {
+    "id": "embeddings",
+    "name": "Embeddings (Gemini, NVIDIA, local MiniLM)",
+    "group": "Retrieval and LLM systems",
+    "usedIn": ["hiring-automation", "knavis"]
+  },
+  {
+    "id": "evals",
+    "name": "Evaluation harnesses",
+    "group": "Retrieval and LLM systems",
+    "usedIn": ["knavis", "retainai"]
+  },
+  {
+    "id": "guarded-sql",
+    "name": "Guarded text-to-SQL",
+    "group": "Retrieval and LLM systems",
+    "usedIn": ["knavis"]
+  },
+  {
+    "id": "voice-integration",
+    "name": "Voice-agent integration (Dograh)",
+    "group": "Retrieval and LLM systems",
+    "usedIn": ["hiring-automation"],
+    "note": "An integration. I did not build speech recognition or synthesis."
+  },
+
+  { "id": "sklearn", "name": "scikit-learn", "group": "Data and ML", "usedIn": ["retainai"] },
+  { "id": "pandas", "name": "pandas and NumPy", "group": "Data and ML", "usedIn": ["retainai"] },
+  {
+    "id": "validation",
+    "name": "Grouped cross-validation, calibration and ablations",
+    "group": "Data and ML",
+    "usedIn": ["retainai"]
+  },
+  {
+    "id": "linear-explanations",
+    "name": "Exact linear model explanations",
+    "group": "Data and ML",
+    "usedIn": ["retainai"]
+  },
+
+  {
+    "id": "postgres",
+    "name": "PostgreSQL",
+    "group": "Datastores",
+    "usedIn": ["hiring-automation", "knavis"]
+  },
+  {
+    "id": "qdrant",
+    "name": "Qdrant",
+    "group": "Datastores",
+    "usedIn": ["hiring-automation", "knavis"]
+  },
+  { "id": "redis", "name": "Redis", "group": "Datastores", "usedIn": ["hiring-automation"] },
+  { "id": "sqlite-fts5", "name": "SQLite and FTS5", "group": "Datastores", "usedIn": ["knavis"] },
+
+  {
+    "id": "react",
+    "name": "React",
+    "group": "Frontend",
+    "usedIn": ["hiring-automation", "knavis", "recruitai"]
+  },
+  {
+    "id": "tanstack-query",
+    "name": "TanStack Query",
+    "group": "Frontend",
+    "usedIn": ["hiring-automation", "recruitai"]
+  },
+  {
+    "id": "tailwind",
+    "name": "Tailwind CSS",
+    "group": "Frontend",
+    "usedIn": ["hiring-automation", "recruitai"]
+  },
+  {
+    "id": "vite",
+    "name": "Vite",
+    "group": "Frontend",
+    "usedIn": ["hiring-automation", "knavis", "recruitai"]
+  },
+
+  {
+    "id": "docker",
+    "name": "Docker and Docker Compose",
+    "group": "Infrastructure and tooling",
+    "usedIn": ["hiring-automation", "knavis"]
+  },
+  {
+    "id": "ci",
+    "name": "GitHub Actions CI",
+    "group": "Infrastructure and tooling",
+    "usedIn": ["hiring-automation", "knavis"]
+  },
+  {
+    "id": "nginx",
+    "name": "nginx",
+    "group": "Infrastructure and tooling",
+    "usedIn": ["hiring-automation", "knavis"]
+  }
+]
