@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://shastri211.github.io/sitemap-index.xml

@@ -1,0 +1,197 @@
+---
+import { site } from '@/data/site';
+import { hasResume } from '@/lib/resume';
+import Icon from './ui/Icon.astro';
+import ThemeToggle from './ui/ThemeToggle.astro';
+
+const path = Astro.url.pathname;
+const internal = [
+  { href: '/work/', label: 'Work' },
+  { href: '/about/', label: 'About' },
+];
+const isCurrent = (href: string) => path === href || path.startsWith(href);
+---
+
+<header class="site-header">
+  <div class="wrap bar">
+    <a class="wordmark" href="/" aria-label={`${site.name}, home`}>
+      {site.name}
+    </a>
+
+    <button
+      class="menu-button label"
+      type="button"
+      popovertarget="site-nav"
+      popovertargetaction="toggle"
+    >
+      Menu
+    </button>
+
+    <nav id="site-nav" class="nav" popover aria-label="Primary">
+      <ul>
+        {internal.map((item) => (
+          <li>
+            <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>
+              {item.label}
+            </a>
+          </li>
+        ))}
+        {hasResume && (
+          <li>
+            <a href={site.links.resume}>
+              Resume <Icon name="download" size={12} />
+            </a>
+          </li>
+        )}
+        <li class="divider" aria-hidden="true"></li>
+        <li>
+          <a href={site.links.github} rel="me noopener">
+            GitHub <Icon name="arrow-up-right" size={12} />
+          </a>
+        </li>
+        <li>
+          <a href={site.links.linkedin} rel="me noopener">
+            LinkedIn <Icon name="arrow-up-right" size={12} />
+          </a>
+        </li>
+        <li class="toggle">
+          <ThemeToggle />
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    --header-h: 4.25rem;
+    border-bottom: 1px solid var(--rule);
+    view-transition-name: site-header;
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: var(--header-h);
+    gap: var(--s-5);
+  }
+
+  .wordmark {
+    font-size: var(--step-1);
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .wordmark:hover {
+    color: var(--accent);
+  }
+
+  .menu-button {
+    padding: var(--s-2) var(--s-3);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    background: transparent;
+    cursor: pointer;
+    color: var(--ink-2);
+  }
+
+  /* ---- small screens: the nav is a popover sheet under the header ---- */
+  .nav {
+    position: fixed;
+    inset: var(--header-h) 0 auto 0;
+    margin: 0;
+    width: auto;
+    max-height: calc(100dvh - var(--header-h));
+    overflow: auto;
+    padding: var(--s-4) var(--gutter) var(--s-6);
+    border: 0;
+    border-bottom: 1px solid var(--rule);
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  .nav ul {
+    list-style: none;
+    display: grid;
+    gap: 0;
+  }
+
+  .nav li:not(.divider):not(.toggle) a {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    padding-block: var(--s-4);
+    border-bottom: 1px solid var(--rule);
+    font-size: var(--step-2);
+    text-decoration: none;
+  }
+
+  .nav .divider {
+    display: none;
+  }
+
+  .nav .toggle {
+    padding-top: var(--s-5);
+  }
+
+  /* ---- wide screens: the nav sits inline; popover hiding is overridden ---- */
+  @media (min-width: 48rem) {
+    .menu-button {
+      display: none;
+    }
+
+    .nav,
+    .nav:not(:popover-open) {
+      display: block;
+      position: static;
+      inset: auto;
+      width: auto;
+      max-height: none;
+      overflow: visible;
+      padding: 0;
+      border: 0;
+      background: transparent;
+    }
+
+    .nav ul {
+      display: flex;
+      align-items: center;
+      gap: var(--s-5);
+    }
+
+    .nav li:not(.divider):not(.toggle) a {
+      display: inline-flex;
+      padding: var(--s-2) 0;
+      border: 0;
+      font-family: var(--font-mono);
+      font-size: var(--step--1);
+      letter-spacing: 0.02em;
+      color: var(--ink-2);
+    }
+
+    .nav li:not(.divider):not(.toggle) a[aria-current='page'] {
+      color: var(--ink);
+      text-decoration-line: underline;
+      text-decoration-color: var(--accent);
+      text-decoration-thickness: 2px;
+      text-underline-offset: 0.5em;
+    }
+
+    .nav li:not(.divider):not(.toggle) a:hover {
+      color: var(--accent);
+    }
+
+    .nav .divider {
+      display: block;
+      width: 1px;
+      height: 1.1rem;
+      background: var(--rule);
+    }
+
+    .nav .toggle {
+      padding: 0;
+    }
+  }
+</style>

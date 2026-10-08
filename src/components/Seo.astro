@@ -1,0 +1,50 @@
+---
+import { site } from '@/data/site';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Pathname of this page, e.g. "/work/knavis/". Defaults to the current URL. */
+  path?: string;
+  type?: 'website' | 'article' | 'profile';
+  image?: string;
+  /** Structured data objects, serialised into JSON-LD. */
+  jsonLd?: Record<string, unknown> | Array<Record<string, unknown>>;
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  path = Astro.url.pathname,
+  type = 'website',
+  image = '/og/default.png',
+  jsonLd,
+  noindex = false,
+} = Astro.props;
+
+const canonical = new URL(path, site.url).href;
+const imageUrl = new URL(image, site.url).href;
+---
+
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex" />}
+
+<meta property="og:site_name" content={site.name} />
+<meta property="og:type" content={type} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={imageUrl} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content="en_IN" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={imageUrl} />
+
+{jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}

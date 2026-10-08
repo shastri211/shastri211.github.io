@@ -1,0 +1,30 @@
+{
+  "name": "portfolio",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Personal engineering portfolio: case studies backed by repositories, evals and diagrams.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "check:contrast": "node scripts/check-contrast.mjs",
+    "check:links": "node scripts/check-links.mjs",
+    "snapshot:activity": "node scripts/snapshot-activity.mjs",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^8.0.3",
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource-variable/newsreader": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "astro": "^7.3.7"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "prettier": "^3.9.9",
+    "prettier-plugin-astro": "^1.1.0",
+    "typescript": "^6.0.3"
+  }
+}
