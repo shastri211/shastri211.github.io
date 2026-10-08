@@ -45,8 +45,11 @@ async function fetchRepo(repo: string, token: string | undefined): Promise<Activ
  * back to the committed snapshot, so the build never fails because GitHub was unreachable.
  */
 export async function getActivity(): Promise<Activity> {
+  const token = process.env.GITHUB_TOKEN;
+  // Dev reloads would burn the unauthenticated rate limit (60 requests an hour), so
+  // outside production builds the snapshot is used unless a token is provided.
+  if (!import.meta.env.PROD && !token) return fromSnapshot();
   try {
-    const token = process.env.GITHUB_TOKEN;
     const lists = await Promise.all(site.activityRepos.map((r) => fetchRepo(r, token)));
     const items = lists
       .flat()
@@ -55,10 +58,14 @@ export async function getActivity(): Promise<Activity> {
     return { items, source: 'live', asOf: new Date().toISOString() };
   } catch (error) {
     console.warn(`[activity] live fetch failed, using snapshot: ${String(error)}`);
-    return {
-      items: (snapshot.items as ActivityItem[]).slice(0, LIMIT),
-      source: 'snapshot',
-      asOf: snapshot.fetchedAt,
-    };
+    return fromSnapshot();
   }
+}
+
+function fromSnapshot(): Activity {
+  return {
+    items: (snapshot.items as ActivityItem[]).slice(0, LIMIT),
+    source: 'snapshot',
+    asOf: snapshot.fetchedAt,
+  };
 }

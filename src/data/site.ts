@@ -2,7 +2,7 @@
 export const site = {
   name: 'Chavi Shastri',
   url: 'https://shastri211.github.io',
-  title: 'Chavi Shastri — software engineer, retrieval and LLM systems',
+  title: 'Chavi Shastri — backend and retrieval systems for language models',
   description:
     'Chavi Shastri builds backend and retrieval systems around language models: job queues, hybrid search, provider fallbacks, evals and tests. Case studies link to the code.',
   /** The one line under the name in the header and in structured data. */
