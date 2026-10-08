@@ -49,7 +49,7 @@ export const journey: JourneyStep[] = [
   {
     when: 'Aug 2026',
     title: 'Retrieval prototypes, and an internship',
-    body: 'A dense-only retrieval prototype, later rebuilt with hybrid search. Started as an AI intern at Onetab AI the same month.',
+    body: 'A dense-only retrieval prototype, later rebuilt with hybrid search. Started as an AI intern at Onetab the same month.',
   },
   {
     when: 'Sep 2026',

@@ -41,7 +41,7 @@ const longDate = new Intl.DateTimeFormat('en-GB', {
     <div class="col-main prose-about">
       <p>
         I am due to finish an M.Tech (Integrated) in Information Technology at IIPS, Indore, in
-        2027, and I have been an AI intern at Onetab AI since August 2026. I started with Python and
+        2027, and I have been an AI intern at Onetab since August 2026. I started with Python and
         SQL coursework. My first portfolio was a template with three data-preparation assignments
         and skill bars I had given myself.
       </p>
@@ -57,8 +57,8 @@ const longDate = new Intl.DateTimeFormat('en-GB', {
         not work, and RetainAI records corrections to its own earlier findings.
       </p>
       <p>
-        I am looking for backend and AI-engineering roles and internships where reliable pipelines
-        around language models are the job. Each case study ends with what I would change.
+        I am open to AI and ML engineering roles, and the work I want most is where reliable
+        pipelines around language models are the job. Each case study ends with what I would change.
       </p>
     </div>
   </section>
@@ -114,7 +114,11 @@ const longDate = new Intl.DateTimeFormat('en-GB', {
     <ul class="col-main plain">
       {certifications.map((c) => (
         <li>
-          <span class="label">{longDate.format(new Date(c.data.issued))}</span>
+          <span class="label">
+            {c.data.issued.length === 7
+              ? formatMonth(c.data.issued)
+              : longDate.format(new Date(c.data.issued))}
+          </span>
           <span>
             <strong>{c.data.title}</strong>
             <br />

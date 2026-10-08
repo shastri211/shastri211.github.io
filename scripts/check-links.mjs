@@ -52,8 +52,21 @@ for (const [url, from] of internal) {
 const headers = { 'user-agent': 'portfolio-link-check', accept: '*/*' };
 if (process.env.GITHUB_TOKEN) headers.authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
 
-async function request(url, method) {
-  return fetch(url, { method, headers, redirect: 'follow', signal: AbortSignal.timeout(20000) });
+async function request(url, method, attempt = 1) {
+  try {
+    return await fetch(url, {
+      method,
+      headers,
+      redirect: 'follow',
+      signal: AbortSignal.timeout(20000),
+    });
+  } catch (error) {
+    // One retry for transient failures, which are common when many requests run at once.
+    const code = String(error.cause?.code ?? error.name);
+    if (attempt < 2 && /timeout|ECONNRESET|ETIMEDOUT|UND_ERR_SOCKET/i.test(code))
+      return request(url, method, attempt + 1);
+    throw error;
+  }
 }
 
 async function checkExternal(url, from) {
@@ -78,13 +91,17 @@ async function checkExternal(url, from) {
       if (last > lines) problems.push(`line ${last} is past the end (${lines} lines)  ${url}`);
     }
   } catch (error) {
-    problems.push(`${String(error.cause?.code ?? error.name)}  ${url}  (linked from ${from})`);
+    const code = String(error.cause?.code ?? error.name);
+    // The server answered, but with response headers larger than Node's fetch accepts.
+    if (code === 'UND_ERR_HEADERS_OVERFLOW')
+      return notes.push(`reachable, oversized headers  ${url.slice(0, 90)}...`);
+    problems.push(`${code}  ${url}  (linked from ${from})`);
   }
 }
 
 const queue = [...external];
 await Promise.all(
-  Array.from({ length: 6 }, async () => {
+  Array.from({ length: 4 }, async () => {
     while (queue.length) {
       const [url, from] = queue.shift();
       await checkExternal(url, from);

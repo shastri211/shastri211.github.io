@@ -11,7 +11,7 @@ export const site = {
   location: 'Indore, India',
   links: {
     github: 'https://github.com/shastri211',
-    linkedin: 'https://www.linkedin.com/in/chavi-shastri',
+    linkedin: 'https://www.linkedin.com/in/chavi-shastri-2256a427a/',
     /** Served from /public. Remove the file and this link disappears from the UI. */
     resume: '/Chavi-Shastri-Resume.pdf',
     source: 'https://github.com/shastri211/shastri211.github.io',

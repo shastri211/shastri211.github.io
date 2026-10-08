@@ -1,16 +1,16 @@
 [
   {
-    "id": "onetab-ai",
-    "organization": "Onetab AI",
+    "id": "onetab",
+    "organization": "Onetab",
     "role": "AI Intern",
     "start": "2026-08",
-    "summary": "Backend and LLM-workflow work on an AI hiring-automation product.",
+    "summary": "An on-site internship in Indore, building backends for an AI hiring-automation product.",
     "work": [
-      "Built asynchronous Python and FastAPI workflows that run LLM calls through background workers, backed by PostgreSQL, Qdrant and Docker.",
-      "Integrated Groq, Google Gemini and OpenRouter behind one interface, with provider fallback, retries and structured outputs.",
-      "Contributed to a hiring-automation platform covering resume processing, semantic candidate matching, screening and automated interviews."
+      "Built async AI workflow backends in Python and FastAPI using PostgreSQL, Redis Streams and background workers, containerised with Docker for reliable task execution.",
+      "Integrated multiple LLM providers (Gemini, Groq, OpenRouter) with automatic fallback, retry handling and schema-validated structured outputs.",
+      "Contributed to an AI hiring-automation platform: resume parsing, candidate profiling, Qdrant-based semantic matching, automated screening and interview workflows."
     ],
-    "stack": ["Python", "FastAPI", "PostgreSQL", "Qdrant", "Redis Streams", "Docker"],
+    "stack": ["Python", "FastAPI", "PostgreSQL", "Redis Streams", "Qdrant", "Docker"],
     "note": "The code from this role is not public and is not linked here. My own Hiring Automation project is a separate repository and is not presented as company work."
   }
 ]

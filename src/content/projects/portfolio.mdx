@@ -44,9 +44,9 @@ metrics:
     source: scripts/check-contrast.mjs, read from the design tokens
     caveat: Computed from the token values, so it cannot drift from the stylesheet. There is no text over images to check.
   - label: Links
-    value: 55 external links resolve, including every GitHub line range
+    value: 59 external links resolve, including every GitHub line range
     source: scripts/check-links.mjs against the production build
-    caveat: LinkedIn blocks bots and is not checked. The site's own canonical URLs can only be checked after deployment.
+    caveat: LinkedIn blocks bots and is not checked, and two Forage links answer with headers too large for the checker to read, so they were confirmed by hand. The site's own canonical URLs can only be checked after deployment.
 evidence:
   - claim: A metric without a real caveat, or a skill without a project, fails the content schema.
     proof: src/content.config.ts

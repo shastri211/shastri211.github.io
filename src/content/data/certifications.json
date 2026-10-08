@@ -1,31 +1,16 @@
 [
   {
-    "id": "be10x-ai-career-accelerator",
-    "title": "Certified AI-Driven Professional, AI Career Accelerator Inner Circle Program",
-    "issuer": "Be10x",
-    "issued": "2026-01-23",
-    "kind": "program"
-  },
-  {
-    "id": "ibm-getting-started-with-data",
-    "title": "Getting Started with Data",
-    "issuer": "IBM SkillsBuild",
-    "issued": "2026-01-29",
+    "id": "infosys-er-modeling",
+    "title": "Introduction to ER Modeling",
+    "issuer": "Infosys Springboard",
+    "issued": "2026-04",
     "kind": "course"
   },
   {
-    "id": "deloitte-data-analytics",
-    "title": "Data Analytics Job Simulation",
-    "issuer": "Deloitte Australia, via Forage",
-    "issued": "2026-02-03",
-    "kind": "job-simulation",
-    "note": "Data analysis and forensic technology tasks."
-  },
-  {
-    "id": "ibm-data-fundamentals",
-    "title": "Data Fundamentals",
-    "issuer": "IBM SkillsBuild",
-    "issued": "2026-02-13",
+    "id": "infosys-business-intelligence",
+    "title": "Introduction to Business Intelligence",
+    "issuer": "Infosys Springboard",
+    "issued": "2026-04",
     "kind": "course"
   },
   {
@@ -34,6 +19,40 @@
     "issuer": "BCG X, via Forage",
     "issued": "2026-02-16",
     "kind": "job-simulation",
-    "note": "Campaign performance analysis and communicating findings."
+    "verifyUrl": "https://www.theforage.com/completion-certificates/SKZxezskWgmFjRvj9/Pchc5rEGyCeozqY5Z_SKZxezskWgmFjRvj9_6964adcb709d0b438e66c2ce_1771232722795_completion_certificate.pdf",
+    "note": "Advising a hypothetical client on multi-channel ad campaign performance."
+  },
+  {
+    "id": "ibm-data-fundamentals",
+    "title": "Data Fundamentals",
+    "issuer": "IBM SkillsBuild",
+    "issued": "2026-02-13",
+    "kind": "course",
+    "verifyUrl": "https://www.credly.com/badges/7e0a129f-0b07-476d-87f5-1f455cf7fad5"
+  },
+  {
+    "id": "deloitte-data-analytics",
+    "title": "Data Analytics Job Simulation",
+    "issuer": "Deloitte Australia, via Forage",
+    "issued": "2026-02-03",
+    "kind": "job-simulation",
+    "verifyUrl": "https://www.theforage.com/completion-certificates/9PBTqmSxAf6zZTseP/io9DzWKe3PTsiS6GG_9PBTqmSxAf6zZTseP_6964adcb709d0b438e66c2ce_1770131922078_completion_certificate.pdf",
+    "note": "Data analysis and forensic technology tasks, with a Tableau dashboard and Excel classification."
+  },
+  {
+    "id": "ibm-getting-started-with-data",
+    "title": "Getting Started with Data",
+    "issuer": "IBM SkillsBuild",
+    "issued": "2026-01-29",
+    "kind": "course",
+    "verifyUrl": "https://www.credly.com/badges/68ae58b4-ca92-4546-830b-68c04b81a1a3"
+  },
+  {
+    "id": "be10x-ai-mastery",
+    "title": "AI Mastery Certificate, Certified AI-Driven Professional",
+    "issuer": "Be10x, AI Career Accelerator Inner Circle Program",
+    "issued": "2026-01-23",
+    "kind": "program",
+    "note": "A multi-phase programme covering generative AI, prompt engineering, analytics, no-code development and automation. Credential ID f5fff47f-02d5-4de0-bcc8-584460628dde1011578."
   }
 ]

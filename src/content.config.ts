@@ -97,7 +97,7 @@ const certifications = defineCollection({
   schema: z.object({
     title: z.string(),
     issuer: z.string(),
-    issued: day,
+    issued: z.union([day, month]),
     kind: z.enum(['course', 'job-simulation', 'program']),
     verifyUrl: z.url().optional(),
     note: z.string().optional(),
