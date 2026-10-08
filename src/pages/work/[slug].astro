@@ -1,0 +1,25 @@
+---
+import { getCollection, render } from 'astro:content';
+import ProjectLayout from '@/layouts/ProjectLayout.astro';
+import TableWrap from '@/components/ui/TableWrap.astro';
+import { assertCaseStudy, byOrder } from '@/lib/case-study';
+
+export async function getStaticPaths() {
+  const projects = (await getCollection('projects', (p) => !p.data.draft)).sort(byOrder);
+  return projects.map((project, i) => {
+    assertCaseStudy(project);
+    const next = projects[(i + 1) % projects.length];
+    return {
+      params: { slug: project.id },
+      props: { project, next: next && next.id !== project.id ? next : undefined },
+    };
+  });
+}
+
+const { project, next } = Astro.props;
+const { Content } = await render(project);
+---
+
+<ProjectLayout project={project} next={next}>
+  <Content components={{ table: TableWrap }} />
+</ProjectLayout>

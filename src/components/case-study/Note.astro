@@ -1,0 +1,36 @@
+---
+interface Props {
+  label: string;
+}
+
+const { label } = Astro.props;
+---
+
+<aside class="note">
+  <p class="label label--caps">{label}</p>
+  <div class="body">
+    <slot />
+  </div>
+</aside>
+
+<style>
+  .note {
+    margin: var(--s-5) 0;
+    padding: var(--s-1) 0 var(--s-1) var(--s-5);
+    border-left: 1px solid var(--ink);
+  }
+
+  .label {
+    margin-bottom: var(--s-2);
+    color: var(--ink-2);
+  }
+
+  .body {
+    font-size: 1.0625rem;
+    line-height: 1.55;
+  }
+
+  .body :global(p + p) {
+    margin-top: var(--s-3);
+  }
+</style>

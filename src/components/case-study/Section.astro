@@ -1,0 +1,43 @@
+---
+interface Props {
+  id: string;
+  title: string;
+}
+
+const { id, title } = Astro.props;
+---
+
+<section id={id} class="cs-section" aria-labelledby={`${id}-heading`}>
+  <h2 id={`${id}-heading`} class="reveal">
+    <span class="n label" aria-hidden="true"></span>
+    <span>{title}</span>
+  </h2>
+  <div class="prose">
+    <slot />
+  </div>
+</section>
+
+<style>
+  .cs-section {
+    counter-increment: cs;
+    padding-top: var(--s-8);
+  }
+
+  .cs-section:first-child {
+    padding-top: 0;
+  }
+
+  h2 {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s-4);
+    margin-bottom: var(--s-5);
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--rule-strong);
+    font-size: var(--step-3);
+  }
+
+  .n::before {
+    content: counter(cs, decimal-leading-zero);
+  }
+</style>

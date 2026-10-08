@@ -1,0 +1,113 @@
+/* Long-form text: case-study sections and the about page. */
+
+.prose {
+  --flow: 1.1em;
+}
+
+.prose > * {
+  max-width: var(--measure);
+}
+
+.prose > * + * {
+  margin-top: var(--flow);
+}
+
+/* things that may break out of the reading measure */
+.prose > .wide,
+.prose > pre,
+.prose > .table-wrap {
+  max-width: none;
+}
+
+.prose h3 {
+  margin-top: 2em;
+  font-size: var(--step-1);
+  font-weight: 500;
+}
+
+.prose h3 + * {
+  margin-top: var(--s-3);
+}
+
+.prose strong {
+  font-weight: 600;
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.25em;
+}
+
+.prose li + li {
+  margin-top: 0.4em;
+}
+
+.prose li::marker {
+  color: var(--ink-3);
+}
+
+.prose :not(pre) > code {
+  padding: 0.08em 0.3em;
+  border-radius: 2px;
+  background: var(--paper-2);
+  font-size: 0.82em;
+  overflow-wrap: anywhere;
+}
+
+.prose pre {
+  margin-block: var(--s-5);
+  padding: var(--s-4) var(--s-5);
+  overflow-x: auto;
+  border-top: 1px solid var(--rule-strong);
+  border-bottom: 1px solid var(--rule);
+  background: var(--paper-2);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  tab-size: 2;
+}
+
+.prose pre code {
+  padding: 0;
+  background: none;
+  font-size: inherit;
+}
+
+/* Shiki emits both theme colours as variables; pick by the active colour scheme. */
+.astro-code,
+.astro-code span {
+  color: light-dark(var(--shiki-light), var(--shiki-dark));
+}
+
+.prose blockquote {
+  margin-inline: 0;
+  padding-left: var(--s-5);
+  border-left: 1px solid var(--ink);
+  font-style: italic;
+  color: var(--ink-2);
+}
+
+.prose .table-wrap {
+  overflow-x: auto;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.prose th,
+.prose td {
+  padding: var(--s-2) var(--s-4) var(--s-2) 0;
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+  vertical-align: top;
+}
+
+.prose th {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  font-weight: 500;
+  color: var(--ink-2);
+  border-bottom-color: var(--rule-strong);
+}

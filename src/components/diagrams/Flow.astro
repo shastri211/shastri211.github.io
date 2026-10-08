@@ -1,0 +1,169 @@
+---
+/**
+ * A staged flow diagram built from real elements instead of an image: the text stays
+ * selectable and readable at any width, and the stages stack on narrow containers.
+ * `bands` are cross-cutting concerns drawn underneath the stages.
+ */
+interface Stage {
+  title: string;
+  items: string[];
+  tone?: 'plain' | 'gate' | 'store';
+}
+
+interface Band {
+  label: string;
+  text: string;
+}
+
+interface Props {
+  /** Accessible name, read before the diagram's contents. */
+  label: string;
+  stages: Stage[];
+  bands?: Band[];
+}
+
+const { label, stages, bands = [] } = Astro.props;
+---
+
+<div class="flow" role="group" aria-label={label}>
+  <ol class="stages">
+    {stages.map((stage, i) => (
+      <li class:list={['stage', `tone-${stage.tone ?? 'plain'}`]}>
+        <span class="step label" aria-hidden="true">
+          {String(i + 1).padStart(2, '0')}
+        </span>
+        <h4>{stage.title}</h4>
+        <ul>
+          {stage.items.map((item) => (
+            <li>{item}</li>
+          ))}
+        </ul>
+      </li>
+    ))}
+  </ol>
+  {bands.length > 0 && (
+    <ul class="bands">
+      {bands.map((band) => (
+        <li>
+          <span class="label label--caps">{band.label}</span>
+          <span class="text">{band.text}</span>
+        </li>
+      ))}
+    </ul>
+  )}
+</div>
+
+<style>
+  .flow {
+    container-type: inline-size;
+  }
+
+  .stages {
+    list-style: none;
+    display: grid;
+    gap: var(--s-5);
+    counter-reset: none;
+  }
+
+  .stage {
+    position: relative;
+    padding-top: var(--s-3);
+    border-top: 1px solid var(--rule-strong);
+  }
+
+  .stage.tone-gate {
+    border-top-color: var(--accent);
+    border-top-width: 2px;
+  }
+
+  .stage.tone-store {
+    border-top-style: dashed;
+  }
+
+  .step {
+    display: block;
+    margin-bottom: var(--s-1);
+  }
+
+  .tone-gate .step {
+    color: var(--accent);
+  }
+
+  h4 {
+    font-size: var(--step-1);
+    font-weight: 500;
+    line-height: 1.2;
+    margin-bottom: var(--s-3);
+  }
+
+  .stage ul {
+    list-style: none;
+    display: grid;
+    gap: var(--s-2);
+  }
+
+  .stage ul li {
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: var(--ink-2);
+    padding-left: var(--s-3);
+    position: relative;
+  }
+
+  .stage ul li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.62em;
+    width: 0.4rem;
+    height: 1px;
+    background: var(--ink-3);
+  }
+
+  .bands {
+    list-style: none;
+    display: grid;
+    gap: 0;
+    margin-top: var(--s-5);
+    border-top: 1px solid var(--rule);
+  }
+
+  .bands li {
+    display: grid;
+    gap: var(--s-1) var(--s-5);
+    padding-block: var(--s-3);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .bands .text {
+    font-size: 0.95rem;
+    line-height: 1.45;
+    color: var(--ink-2);
+    max-width: 70ch;
+  }
+
+  @container (min-width: 44rem) {
+    .stages {
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(0, 1fr);
+      gap: var(--s-6);
+    }
+
+    .stage + .stage::before {
+      content: '';
+      position: absolute;
+      top: -5px;
+      left: calc(var(--s-6) / -2 - 4px);
+      width: 8px;
+      height: 8px;
+      border-top: 1.4px solid var(--ink);
+      border-right: 1.4px solid var(--ink);
+      background: var(--paper);
+      transform: rotate(45deg);
+    }
+
+    .bands li {
+      grid-template-columns: 9rem minmax(0, 1fr);
+    }
+  }
+</style>

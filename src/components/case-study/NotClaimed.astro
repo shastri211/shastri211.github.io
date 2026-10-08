@@ -1,0 +1,46 @@
+---
+interface Props {
+  items: string[];
+}
+
+const { items } = Astro.props;
+---
+
+{items.length > 0 && (
+  <aside class="not-claimed wide" aria-labelledby="not-claimed-heading">
+    <h3 id="not-claimed-heading" class="label label--caps">
+      Not claimed
+    </h3>
+    <ul>
+      {items.map((item) => (
+        <li>{item}</li>
+      ))}
+    </ul>
+  </aside>
+)}
+
+<style>
+  .not-claimed {
+    margin: var(--s-6) 0 0;
+    padding: var(--s-4) 0 var(--s-4) var(--s-5);
+    border-left: 2px solid var(--accent);
+  }
+
+  h3 {
+    margin-bottom: var(--s-3);
+    color: var(--accent);
+  }
+
+  ul {
+    list-style: none;
+    display: grid;
+    gap: var(--s-2);
+    max-width: var(--measure);
+  }
+
+  li {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+</style>

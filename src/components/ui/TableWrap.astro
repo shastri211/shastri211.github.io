@@ -1,0 +1,12 @@
+---
+/**
+ * Wraps Markdown tables so a wide one scrolls inside its own box instead of widening the
+ * page. The wrapper is focusable so keyboard users can scroll it.
+ */
+---
+
+<div class="table-wrap" role="region" aria-label="Table" tabindex="0">
+  <table>
+    <slot />
+  </table>
+</div>

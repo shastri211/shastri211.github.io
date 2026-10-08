@@ -1,0 +1,74 @@
+---
+interface Props {
+  title: string;
+  chose: string;
+  over: string;
+  because: string;
+  /** What the choice gave up. Required: a decision with no cost is not a trade-off. */
+  cost: string;
+}
+
+const { title, chose, over, because, cost } = Astro.props;
+---
+
+<article class="decision wide">
+  <h3>{title}</h3>
+  <dl>
+    <div>
+      <dt class="label label--caps">Chose</dt>
+      <dd>{chose}</dd>
+    </div>
+    <div>
+      <dt class="label label--caps">Over</dt>
+      <dd>{over}</dd>
+    </div>
+    <div>
+      <dt class="label label--caps">Because</dt>
+      <dd>{because}</dd>
+    </div>
+    <div>
+      <dt class="label label--caps">Cost</dt>
+      <dd>{cost}</dd>
+    </div>
+  </dl>
+</article>
+
+<style>
+  .decision {
+    margin: var(--s-6) 0;
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--rule);
+  }
+
+  h3 {
+    font-size: var(--step-1);
+    font-weight: 500;
+    margin-bottom: var(--s-4);
+  }
+
+  dl {
+    display: grid;
+    gap: var(--s-3);
+    margin: 0;
+  }
+
+  dl > div {
+    display: grid;
+    gap: var(--s-1) var(--gap);
+  }
+
+  dd {
+    margin: 0;
+    max-width: var(--measure);
+  }
+
+  dt {
+    padding-top: 0.35rem;
+  }
+
+  @media (min-width: 40rem) {
+    dl > div {
+      grid-template-columns: 6rem minmax(0, 1fr);
+    }
+  }
+</style>

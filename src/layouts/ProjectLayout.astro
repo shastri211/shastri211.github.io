@@ -1,0 +1,342 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from './BaseLayout.astro';
+import Note from '@/components/case-study/Note.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { site } from '@/data/site';
+import { formatPeriod, sectionsIn, statusLabel } from '@/lib/case-study';
+import '@/styles/prose.css';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  next?: CollectionEntry<'projects'> | undefined;
+}
+
+const { project, next } = Astro.props;
+const { data } = project;
+const sections = sectionsIn(project);
+const path = `/work/${project.id}/`;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareSourceCode',
+  name: data.title,
+  description: data.description,
+  url: new URL(path, site.url).href,
+  ...(data.links.repo ? { codeRepository: data.links.repo } : {}),
+  programmingLanguage: data.stack.flatMap((g) => g.items).slice(0, 4),
+  author: { '@type': 'Person', name: site.name, url: site.url },
+  dateCreated: data.period.start,
+};
+---
+
+<BaseLayout
+  title={`${data.title} — case study | ${site.name}`}
+  description={data.description}
+  path={path}
+  type="article"
+  jsonLd={jsonLd}
+>
+  <article class="case">
+    <header class="wrap grid head">
+      <p class="col-rail label label--caps kicker">Case study</p>
+      <div class="col-main">
+        <h1>{data.title}</h1>
+        <p class="tagline">{data.tagline}</p>
+      </div>
+
+      <dl class="col-main facts">
+        <div>
+          <dt class="label label--caps">Status</dt>
+          <dd>
+            <strong>{statusLabel[data.status]}.</strong>
+            {data.statusNote}
+          </dd>
+        </div>
+        <div>
+          <dt class="label label--caps">Period</dt>
+          <dd>{formatPeriod(data.period)}</dd>
+        </div>
+        <div>
+          <dt class="label label--caps">My part</dt>
+          <dd>{data.role}</dd>
+        </div>
+        {data.collaborators.length > 0 && (
+          <div>
+            <dt class="label label--caps">With</dt>
+            <dd>
+              {data.collaborators.map((c, i) => (
+                <>
+                  {i > 0 && <br />}
+                  {c.url ? <a href={c.url}>{c.name}</a> : c.name}
+                  {' — '}
+                  {c.contribution}
+                </>
+              ))}
+            </dd>
+          </div>
+        )}
+        <div>
+          <dt class="label label--caps">Stack</dt>
+          <dd>
+            {data.stack.map((g) => (
+              <span class="stack-group">
+                <span class="label">{g.group}</span> {g.items.join(', ')}
+              </span>
+            ))}
+          </dd>
+        </div>
+        <div>
+          <dt class="label label--caps">Code</dt>
+          <dd>
+            {data.links.repo ? (
+              <a href={data.links.repo} rel="noopener">
+                {data.links.repo.replace('https://github.com/', '')}{' '}
+                <Icon name="arrow-up-right" size={12} />
+              </a>
+            ) : (
+              <span>Not linked.</span>
+            )}
+            {data.pinned && (
+              <span class="pin label">
+                Links on this page are pinned to commit{' '}
+                <a
+                  href={`https://github.com/${data.pinned.repo}/commit/${data.pinned.commit}`}
+                  rel="noopener"
+                >
+                  {data.pinned.commit.slice(0, 7)}
+                </a>
+                .
+              </span>
+            )}
+          </dd>
+        </div>
+      </dl>
+
+      {data.builtWith && (
+        <div class="col-main">
+          <Note label="How it was built">
+            <p>{data.builtWith}</p>
+          </Note>
+        </div>
+      )}
+    </header>
+
+    <div class="wrap grid body">
+      <aside class="col-rail contents" aria-label="Contents">
+        <details open>
+          <summary class="label label--caps">Contents</summary>
+          <ol>
+            {sections.map((s) => (
+              <li>
+                <a href={`#${s.id}`}>{s.title}</a>
+              </li>
+            ))}
+          </ol>
+        </details>
+      </aside>
+      <div class="col-main case-body">
+        <slot />
+      </div>
+    </div>
+
+    {next && (
+      <nav class="wrap next" aria-label="Next case study">
+        <p class="label label--caps">Next</p>
+        <a href={`/work/${next.id}/`}>
+          <span class="t">{next.data.title}</span>
+          <span class="d">{next.data.tagline}</span>
+          <Icon name="arrow-right" size={18} />
+        </a>
+      </nav>
+    )}
+  </article>
+</BaseLayout>
+
+<script>
+  // Highlight the contents link for the section nearest the top of the viewport.
+  const links = new Map<string, HTMLAnchorElement>();
+  document.querySelectorAll<HTMLAnchorElement>('.contents a').forEach((a) => {
+    links.set(a.hash.slice(1), a);
+  });
+  const sections = [...links.keys()]
+    .map((id) => document.getElementById(id))
+    .filter((el): el is HTMLElement => el !== null);
+
+  if ('IntersectionObserver' in window && sections.length) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          links.forEach((a) => a.removeAttribute('aria-current'));
+          links.get(entry.target.id)?.setAttribute('aria-current', 'true');
+        }
+      },
+      { rootMargin: '-15% 0px -75% 0px' },
+    );
+    sections.forEach((s) => observer.observe(s));
+  }
+</script>
+
+<style>
+  .head {
+    padding-top: var(--s-8);
+    padding-bottom: var(--s-7);
+    row-gap: var(--s-5);
+  }
+
+  .kicker {
+    padding-top: 0.6rem;
+  }
+
+  h1 {
+    font-size: var(--step-4);
+    letter-spacing: -0.02em;
+  }
+
+  .tagline {
+    margin-top: var(--s-4);
+    max-width: 38ch;
+    font-size: var(--step-2);
+    line-height: 1.3;
+    color: var(--ink-2);
+  }
+
+  .facts {
+    display: grid;
+    margin: var(--s-4) 0 0;
+    border-top: 1px solid var(--rule-strong);
+  }
+
+  .facts > div {
+    display: grid;
+    gap: var(--s-1) var(--gap);
+    padding-block: var(--s-3);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .facts dt {
+    padding-top: 0.3rem;
+  }
+
+  .facts dd {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .stack-group {
+    display: block;
+  }
+
+  .stack-group .label {
+    margin-right: var(--s-2);
+  }
+
+  .pin {
+    display: block;
+    margin-top: var(--s-1);
+  }
+
+  @media (min-width: 40rem) {
+    .facts > div {
+      grid-template-columns: 7rem minmax(0, 1fr);
+    }
+  }
+
+  .body {
+    padding-bottom: var(--section);
+    row-gap: var(--s-6);
+  }
+
+  .contents summary {
+    cursor: pointer;
+    padding-block: var(--s-2);
+    list-style: none;
+  }
+
+  .contents summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .contents ol {
+    list-style: none;
+    margin-top: var(--s-2);
+    counter-reset: toc;
+  }
+
+  .contents li {
+    counter-increment: toc;
+  }
+
+  .contents a {
+    display: flex;
+    gap: var(--s-3);
+    padding-block: 0.3rem;
+    font-size: 0.9375rem;
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+
+  .contents a::before {
+    content: counter(toc, decimal-leading-zero);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    padding-top: 0.2em;
+    color: var(--ink-3);
+  }
+
+  .contents a:hover {
+    color: var(--accent);
+  }
+
+  .contents a[aria-current='true'] {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.35em;
+  }
+
+  @media (min-width: 60rem) {
+    .contents {
+      align-self: start;
+      position: sticky;
+      top: var(--s-6);
+    }
+  }
+
+  .case-body {
+    counter-reset: cs;
+    min-width: 0;
+  }
+
+  .next {
+    padding-block: var(--s-7);
+    border-top: 1px solid var(--rule-strong);
+  }
+
+  .next a {
+    display: grid;
+    gap: var(--s-2);
+    margin-top: var(--s-3);
+    text-decoration: none;
+  }
+
+  .next .t {
+    font-size: var(--step-3);
+    line-height: 1.15;
+  }
+
+  .next .d {
+    max-width: 52ch;
+    color: var(--ink-2);
+  }
+</style>
+
+<script is:inline>
+  // On narrow screens the contents list starts collapsed.
+  if (window.matchMedia('(max-width: 59.99rem)').matches) {
+    document.querySelector('.contents details')?.removeAttribute('open');
+  }
+</script>

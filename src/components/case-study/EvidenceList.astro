@@ -1,0 +1,68 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+
+interface Item {
+  claim: string;
+  proof: string;
+  href?: string | undefined;
+}
+
+interface Props {
+  items: Item[];
+}
+
+const { items } = Astro.props;
+---
+
+{items.length > 0 && (
+  <dl class="evidence wide">
+    {items.map((item) => (
+      <div>
+        <dt>{item.claim}</dt>
+        <dd>
+          {item.href ? (
+            <a href={item.href} rel="noopener">
+              {item.proof} <Icon name="arrow-up-right" size={11} />
+            </a>
+          ) : (
+            item.proof
+          )}
+        </dd>
+      </div>
+    ))}
+  </dl>
+)}
+
+<style>
+  .evidence {
+    margin: var(--s-6) 0;
+    border-top: 1px solid var(--rule-strong);
+  }
+
+  .evidence > div {
+    display: grid;
+    gap: var(--s-1) var(--gap);
+    padding-block: var(--s-3);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  dt {
+    max-width: 48ch;
+  }
+
+  dd {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    line-height: 1.5;
+    color: var(--ink-2);
+    overflow-wrap: anywhere;
+  }
+
+  @media (min-width: 52rem) {
+    .evidence > div {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: baseline;
+    }
+  }
+</style>

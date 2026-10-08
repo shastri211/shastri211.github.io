@@ -1,0 +1,99 @@
+---
+interface Metric {
+  label: string;
+  value: string;
+  source: string;
+  sourceUrl?: string | undefined;
+  caveat: string;
+}
+
+interface Props {
+  items: Metric[];
+}
+
+const { items } = Astro.props;
+---
+
+{items.length > 0 && (
+  <dl class="metrics wide">
+    {items.map((m) => (
+      <div class="metric">
+        <dt>{m.label}</dt>
+        <dd class="value">{m.value}</dd>
+        <dd class="caveat">{m.caveat}</dd>
+        <dd class="source label">
+          {m.sourceUrl ? (
+            <a href={m.sourceUrl} rel="noopener">
+              {m.source}
+            </a>
+          ) : (
+            m.source
+          )}
+        </dd>
+      </div>
+    ))}
+  </dl>
+)}
+
+<style>
+  .metrics {
+    margin: var(--s-6) 0;
+    border-top: 1px solid var(--rule-strong);
+  }
+
+  .metric {
+    display: grid;
+    gap: var(--s-1) var(--gap);
+    padding-block: var(--s-4);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  dt {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--ink-2);
+  }
+
+  dd {
+    margin: 0;
+  }
+
+  .value {
+    font-size: var(--step-2);
+    line-height: 1.2;
+    font-variant-numeric: lining-nums;
+  }
+
+  .caveat {
+    font-size: 1rem;
+    line-height: 1.45;
+    color: var(--ink-2);
+    max-width: 52ch;
+  }
+
+  .source {
+    overflow-wrap: anywhere;
+  }
+
+  @media (min-width: 52rem) {
+    .metric {
+      grid-template-columns: 11rem minmax(0, 12rem) minmax(0, 1fr);
+      grid-template-areas:
+        'label value caveat'
+        'label value source';
+      align-items: baseline;
+    }
+    dt {
+      grid-area: label;
+    }
+    .value {
+      grid-area: value;
+    }
+    .caveat {
+      grid-area: caveat;
+    }
+    .source {
+      grid-area: source;
+    }
+  }
+</style>

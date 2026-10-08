@@ -1,0 +1,67 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import ProjectRow from '@/components/home/ProjectRow.astro';
+import { site } from '@/data/site';
+import { byOrder } from '@/lib/case-study';
+
+const projects = (await getCollection('projects', (p) => !p.data.draft)).sort(byOrder);
+---
+
+<BaseLayout
+  title={`Work | ${site.name}`}
+  description="Every project with a case study: what it does, how it is built, what failed, and links to the code."
+  path="/work/"
+>
+  <header class="wrap grid head">
+    <p class="col-rail label label--caps kicker">Work</p>
+    <div class="col-main">
+      <h1>Everything I would show you, in order.</h1>
+      <p class="lede">
+        Each entry has a case study with the architecture, the decisions, the bugs, and links to the
+        code at a pinned commit. Things I did not build alone say so.
+      </p>
+    </div>
+  </header>
+  <div class="wrap list">
+    <ul>
+      {projects.map((p) => (
+        <ProjectRow project={p} />
+      ))}
+    </ul>
+  </div>
+</BaseLayout>
+
+<style>
+  .head {
+    padding-top: var(--s-8);
+    padding-bottom: var(--s-7);
+    row-gap: var(--s-4);
+  }
+
+  .kicker {
+    padding-top: 0.7rem;
+  }
+
+  h1 {
+    max-width: 20ch;
+    font-size: var(--step-4);
+    letter-spacing: -0.02em;
+  }
+
+  .lede {
+    margin-top: var(--s-4);
+    max-width: 52ch;
+    font-size: var(--step-1);
+    color: var(--ink-2);
+  }
+
+  .list {
+    border-top: 1px solid var(--rule-strong);
+    padding: 0;
+  }
+
+  .list ul {
+    padding: 0;
+  }
+</style>

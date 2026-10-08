@@ -1,0 +1,35 @@
+---
+interface Props {
+  caption: string;
+  /** Short identifier, e.g. "Fig. 1". */
+  label?: string;
+}
+
+const { caption, label } = Astro.props;
+---
+
+<figure class="wide">
+  <div class="body">
+    <slot />
+  </div>
+  <figcaption class="label">
+    {label && <span class="id">{label}</span>}
+    {caption}
+  </figcaption>
+</figure>
+
+<style>
+  figure {
+    margin: var(--s-6) 0;
+  }
+
+  figcaption {
+    margin-top: var(--s-3);
+    max-width: 70ch;
+  }
+
+  .id {
+    margin-right: var(--s-3);
+    color: var(--ink);
+  }
+</style>
