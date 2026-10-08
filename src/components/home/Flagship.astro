@@ -1,0 +1,164 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Icon from '@/components/ui/Icon.astro';
+import { formatPeriod, statusLabel } from '@/lib/case-study';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  index: number;
+}
+
+const { project, index } = Astro.props;
+const { data } = project;
+const metric = data.metrics[0];
+const href = `/work/${project.id}/`;
+---
+
+<article class="flagship wrap grid reveal">
+  <div class="col-rail rail">
+    <p class="num">{String(index).padStart(2, '0')}</p>
+    <p class="label">{formatPeriod(data.period)}</p>
+    <p class="label status">{statusLabel[data.status]}</p>
+  </div>
+
+  <div class="col-main main">
+    <h3>
+      <a href={href}>{data.title}</a>
+    </h3>
+    <p class="tagline">{data.tagline}</p>
+
+    <div class="detail">
+      <p class="summary">{data.summary}</p>
+
+      {metric && (
+        <div class="metric">
+          <p class="label label--caps">{metric.label}</p>
+          <p class="value">{metric.value}</p>
+          <p class="caveat">{metric.caveat}</p>
+        </div>
+      )}
+    </div>
+
+    <p class="stack label">
+      {data.stack
+        .flatMap((g) => g.items)
+        .slice(0, 8)
+        .join(' · ')}
+    </p>
+
+    <p class="links">
+      <a class="btn" href={href}>
+        Read the case study <Icon name="arrow-right" size={14} />
+      </a>
+      {data.links.repo && (
+        <a class="quiet label" href={data.links.repo} rel="noopener">
+          Source on GitHub <Icon name="arrow-up-right" size={11} />
+        </a>
+      )}
+    </p>
+  </div>
+</article>
+
+<style>
+  .flagship {
+    padding-block: var(--s-7);
+    border-top: 1px solid var(--rule-strong);
+    row-gap: var(--s-4);
+  }
+
+  .num {
+    font-family: var(--font-mono);
+    font-size: var(--step-3);
+    line-height: 1;
+    color: var(--accent);
+  }
+
+  .rail {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s-1) var(--s-4);
+  }
+
+  @media (min-width: 60rem) {
+    .rail {
+      display: block;
+    }
+    .rail .label {
+      margin-top: var(--s-2);
+    }
+  }
+
+  h3 {
+    font-size: var(--step-4);
+    letter-spacing: -0.02em;
+  }
+
+  h3 a {
+    text-decoration: none;
+  }
+
+  h3 a:hover {
+    color: var(--accent);
+  }
+
+  .tagline {
+    margin-top: var(--s-4);
+    max-width: 42ch;
+    font-size: var(--step-2);
+    line-height: 1.3;
+    color: var(--ink-2);
+  }
+
+  .detail {
+    display: grid;
+    gap: var(--s-5) var(--s-7);
+    margin-top: var(--s-6);
+    align-items: start;
+  }
+
+  .summary {
+    max-width: 52ch;
+  }
+
+  .metric {
+    padding-top: var(--s-3);
+    border-top: 1px solid var(--rule);
+  }
+
+  .value {
+    margin-top: var(--s-1);
+    font-size: var(--step-1);
+    line-height: 1.25;
+  }
+
+  .caveat {
+    margin-top: var(--s-2);
+    font-size: 0.9375rem;
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+
+  @media (min-width: 52rem) {
+    .detail {
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    }
+  }
+
+  .stack {
+    margin-top: var(--s-5);
+    max-width: 70ch;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-4) var(--s-5);
+    margin-top: var(--s-5);
+  }
+
+  .quiet {
+    color: var(--ink-2);
+  }
+</style>

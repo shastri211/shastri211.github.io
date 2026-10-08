@@ -1,0 +1,378 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Flagship from '@/components/home/Flagship.astro';
+import ProjectRow from '@/components/home/ProjectRow.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { site } from '@/data/site';
+import { journey } from '@/data/profile';
+import { hasResume } from '@/lib/resume';
+import { byOrder } from '@/lib/case-study';
+import { getActivity } from '@/lib/github-activity';
+
+const projects = (await getCollection('projects', (p) => !p.data.draft)).sort(byOrder);
+const flagships = projects.filter((p) => p.data.kind === 'flagship');
+const others = projects.filter((p) => p.data.kind !== 'flagship');
+
+const skills = await getCollection('skills');
+const groups = new Map<string, string[]>();
+for (const s of skills) {
+  groups.set(s.data.group, [...(groups.get(s.data.group) ?? []), s.data.name]);
+}
+
+const experience = (await getCollection('experience'))[0];
+const activity = await getActivity();
+const fmt = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfilePage',
+  mainEntity: {
+    '@type': 'Person',
+    name: site.name,
+    jobTitle: site.jobTitle,
+    url: site.url,
+    email: `mailto:${site.email}`,
+    sameAs: [site.links.github, site.links.linkedin],
+    alumniOf: { '@type': 'CollegeOrUniversity', name: 'IIPS, Devi Ahilya Vishwavidyalaya' },
+    ...(experience
+      ? { worksFor: { '@type': 'Organization', name: experience.data.organization } }
+      : {}),
+  },
+};
+---
+
+<BaseLayout
+  title={site.title}
+  description={site.description}
+  path="/"
+  type="profile"
+  jsonLd={jsonLd}
+>
+  <section class="hero wrap grid" aria-labelledby="hero-title">
+    <p class="col-rail label label--caps kicker">
+      {site.name}
+      <br />
+      Portfolio, 2026
+    </p>
+    <div class="col-main">
+      <h1 id="hero-title">
+        I build the systems around language models, and write down where they break.
+      </h1>
+      <p class="lede">
+        I study M.Tech (Integrated) Information Technology at IIPS, Indore, and work as an AI intern
+        at Onetab AI. My projects are Python and FastAPI backends, retrieval pipelines, job queues,
+        and the tests and evals that keep them honest.
+      </p>
+      <p class="actions">
+        <a class="btn" href="/work/">
+          See the work <Icon name="arrow-right" size={14} />
+        </a>
+        <a class="label" href={site.links.github} rel="me noopener">
+          GitHub <Icon name="arrow-up-right" size={11} />
+        </a>
+        <a class="label" href={site.links.linkedin} rel="me noopener">
+          LinkedIn <Icon name="arrow-up-right" size={11} />
+        </a>
+        {hasResume && (
+          <a class="label" href={site.links.resume}>
+            Resume <Icon name="download" size={11} />
+          </a>
+        )}
+      </p>
+    </div>
+
+    <dl class="col-main now">
+      <div>
+        <dt class="label label--caps">Working on</dt>
+        <dd>
+          {activity.items[0] ? (
+            <a href={activity.items[0].url} rel="noopener">
+              {activity.items[0].message}
+            </a>
+          ) : (
+            'Nothing public this week.'
+          )}
+          {activity.items[0] && (
+            <span class="label">
+              {activity.items[0].repo.split('/')[1]}, {fmt.format(new Date(activity.items[0].date))}
+            </span>
+          )}
+        </dd>
+      </div>
+      <div>
+        <dt class="label label--caps">Where</dt>
+        <dd>{site.location}</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="section" aria-labelledby="work-title">
+    <div class="wrap section-head">
+      <h2 id="work-title">Selected work</h2>
+      <a class="label" href="/work/">
+        All work <Icon name="arrow-right" size={11} />
+      </a>
+    </div>
+    {flagships.map((p, i) => (
+      <Flagship project={p} index={i + 1} />
+    ))}
+
+    {others.length > 0 && (
+      <div class="wrap more">
+        <p class="label label--caps">Also</p>
+        <ul>
+          {others.map((p) => (
+            <ProjectRow project={p} />
+          ))}
+        </ul>
+      </div>
+    )}
+  </section>
+
+  <section class="section wrap grid" aria-labelledby="journey-title">
+    <div class="col-rail">
+      <h2 id="journey-title" class="label label--caps">
+        How the work progressed
+      </h2>
+    </div>
+    <ol class="col-main journey">
+      {journey.map((step) => (
+        <li>
+          <p class="when label">{step.when}</p>
+          <div>
+            <h3>
+              {step.project ? <a href={`/work/${step.project}/`}>{step.title}</a> : step.title}
+            </h3>
+            <p>{step.body}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="section wrap grid" aria-labelledby="skills-title">
+    <div class="col-rail">
+      <h2 id="skills-title" class="label label--caps">
+        What I use
+      </h2>
+      <p class="note-s label">Only technologies a project above actually uses.</p>
+    </div>
+    <div class="col-main">
+      <dl class="skills">
+        {[...groups.entries()].map(([group, names]) => (
+          <div>
+            <dt class="label">{group}</dt>
+            <dd>{names.join(', ')}</dd>
+          </div>
+        ))}
+      </dl>
+      <p class="more-link">
+        <a class="label" href="/about/#skills">
+          Where each one was used <Icon name="arrow-right" size={11} />
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <section class="section wrap grid" aria-labelledby="activity-title">
+    <div class="col-rail">
+      <h2 id="activity-title" class="label label--caps">
+        Latest commits
+      </h2>
+      <p class="note-s label">
+        {activity.source === 'live' ? 'Read from GitHub at build time.' : 'Snapshot, not live.'}
+      </p>
+    </div>
+    <ul class="col-main activity">
+      {activity.items.map((item) => (
+        <li>
+          <span class="label">{fmt.format(new Date(item.date))}</span>
+          <span class="repo label">{item.repo.split('/')[1]}</span>
+          <a href={item.url} rel="noopener">
+            {item.message}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    padding-top: clamp(3rem, 2rem + 6vw, 7rem);
+    row-gap: var(--s-6);
+  }
+
+  .kicker {
+    padding-top: 0.9rem;
+  }
+
+  h1 {
+    max-width: 18ch;
+    font-size: var(--step-4);
+    font-weight: 420;
+    line-height: 1.06;
+    letter-spacing: -0.025em;
+  }
+
+  .lede {
+    margin-top: var(--s-5);
+    max-width: 50ch;
+    font-size: var(--step-1);
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-4) var(--s-5);
+    margin-top: var(--s-6);
+  }
+
+  .actions a.label {
+    color: var(--ink);
+  }
+
+  .now {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .now > div {
+    display: grid;
+    gap: var(--s-1) var(--gap);
+    padding-block: var(--s-3);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .now dd {
+    margin: 0;
+    display: grid;
+    gap: var(--s-1);
+    font-size: 1.0625rem;
+    line-height: 1.4;
+  }
+
+  @media (min-width: 40rem) {
+    .now > div {
+      grid-template-columns: 8rem minmax(0, 1fr);
+    }
+  }
+
+  .section-head {
+    margin-bottom: var(--s-5);
+  }
+
+  .more {
+    padding-top: var(--s-7);
+  }
+
+  .more > .label {
+    padding-bottom: var(--s-3);
+    border-bottom: 1px solid var(--rule-strong);
+  }
+
+  .more ul {
+    padding: 0;
+  }
+
+  .journey {
+    list-style: none;
+    display: grid;
+    gap: 0;
+    border-top: 1px solid var(--rule-strong);
+  }
+
+  .journey li {
+    display: grid;
+    gap: var(--s-1) var(--gap);
+    padding-block: var(--s-4);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .journey .when {
+    padding-top: 0.35rem;
+  }
+
+  .journey h3 {
+    font-size: var(--step-1);
+    font-weight: 500;
+  }
+
+  .journey p:not(.label) {
+    margin-top: var(--s-1);
+    max-width: 58ch;
+    color: var(--ink-2);
+    font-size: 1.0625rem;
+    line-height: 1.5;
+  }
+
+  @media (min-width: 40rem) {
+    .journey li {
+      grid-template-columns: 9rem minmax(0, 1fr);
+    }
+  }
+
+  .note-s {
+    margin-top: var(--s-2);
+    max-width: 24ch;
+  }
+
+  .skills {
+    display: grid;
+    margin: 0;
+    border-top: 1px solid var(--rule-strong);
+  }
+
+  .skills > div {
+    display: grid;
+    gap: var(--s-1) var(--gap);
+    padding-block: var(--s-3);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .skills dt {
+    padding-top: 0.3rem;
+  }
+
+  .skills dd {
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  @media (min-width: 40rem) {
+    .skills > div {
+      grid-template-columns: 13rem minmax(0, 1fr);
+    }
+  }
+
+  .more-link {
+    margin-top: var(--s-4);
+  }
+
+  .activity {
+    list-style: none;
+    border-top: 1px solid var(--rule-strong);
+  }
+
+  .activity li {
+    display: grid;
+    gap: var(--s-1) var(--gap);
+    padding-block: var(--s-3);
+    border-bottom: 1px solid var(--rule);
+    font-size: 1.0625rem;
+    line-height: 1.4;
+  }
+
+  @media (min-width: 52rem) {
+    .activity li {
+      grid-template-columns: 4.5rem 9rem minmax(0, 1fr);
+      align-items: baseline;
+    }
+  }
+</style>

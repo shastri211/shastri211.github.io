@@ -1,0 +1,54 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Icon from '@/components/ui/Icon.astro';
+---
+
+<BaseLayout
+  title="Page not found | Chavi Shastri"
+  description="This page does not exist."
+  path="/404/"
+  noindex
+>
+  <section class="wrap grid nf">
+    <p class="col-rail label label--caps">404</p>
+    <div class="col-main">
+      <h1>That page is not here.</h1>
+      <p>
+        It may have moved when this site replaced the old one. The work is a better place to start.
+      </p>
+      <p class="go">
+        <a class="btn" href="/work/">
+          See the work <Icon name="arrow-right" size={14} />
+        </a>
+        <a class="label" href="/">
+          Home
+        </a>
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .nf {
+    padding-block: var(--s-8);
+    row-gap: var(--s-4);
+  }
+
+  h1 {
+    font-size: var(--step-4);
+    letter-spacing: -0.02em;
+  }
+
+  p {
+    margin-top: var(--s-4);
+    max-width: 44ch;
+    color: var(--ink-2);
+  }
+
+  .go {
+    display: flex;
+    align-items: center;
+    gap: var(--s-5);
+    margin-top: var(--s-6);
+  }
+</style>

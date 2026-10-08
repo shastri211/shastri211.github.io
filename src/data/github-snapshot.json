@@ -1,0 +1,59 @@
+{
+  "fetchedAt": "2026-10-08T07:08:41.524Z",
+  "items": [
+    {
+      "repo": "shastri211/RetainAI",
+      "date": "2026-10-06T15:53:43Z",
+      "message": "test: compare regenerated reports ignoring line endings",
+      "url": "https://github.com/shastri211/RetainAI/commit/007387614e5ee381c364169d21e1df33c49e5a52"
+    },
+    {
+      "repo": "shastri211/RetainAI",
+      "date": "2026-10-06T15:37:28Z",
+      "message": "docs: document phase 1 retention foundation",
+      "url": "https://github.com/shastri211/RetainAI/commit/8c099be9328fb001f5b3cdc0eaa66ef4c92875f2"
+    },
+    {
+      "repo": "shastri211/RetainAI",
+      "date": "2026-10-06T15:34:47Z",
+      "message": "test: add retention foundation tests",
+      "url": "https://github.com/shastri211/RetainAI/commit/2253a5a58dc1f7609f6bd92890d4d2f2eedcfec5"
+    },
+    {
+      "repo": "shastri211/knavis",
+      "date": "2026-10-03T08:47:12Z",
+      "message": "Phase 6: embedding limit for huge documents, object storage for uploads and spreadsheet tables (#6)",
+      "url": "https://github.com/shastri211/knavis/commit/c2a5d35272ab0e7ee68199ae2a1007ce5869cc26"
+    },
+    {
+      "repo": "shastri211/Hiring_Automation",
+      "date": "2026-10-03T07:54:10Z",
+      "message": "Phase 8 polish: keep Decision breakdown labels and drop Dashboard job placeholder",
+      "url": "https://github.com/shastri211/Hiring_Automation/commit/d99bc2bb6794a173afbeb374ad628d1cae6273ff"
+    },
+    {
+      "repo": "shastri211/Hiring_Automation",
+      "date": "2026-10-03T07:49:31Z",
+      "message": "Phase 8 QA follow-up: 1024px and mobile responsive fixes",
+      "url": "https://github.com/shastri211/Hiring_Automation/commit/b1f925bf9d4d8fbe21cbeb71971e4507451d2886"
+    },
+    {
+      "repo": "shastri211/Hiring_Automation",
+      "date": "2026-10-03T07:07:36Z",
+      "message": "Phase 8: product-wide QA fixes",
+      "url": "https://github.com/shastri211/Hiring_Automation/commit/357868163941cb1cd6a4e1ad7bad527912f02713"
+    },
+    {
+      "repo": "shastri211/knavis",
+      "date": "2026-10-03T06:55:34Z",
+      "message": "Phase 5: restart-safe jobs, PostgreSQL and Alembic, admin tools, shared workers, account confirmation, upload checks (#5)",
+      "url": "https://github.com/shastri211/knavis/commit/5f66f1e6c967923bd43523b74c1f0cf4ecdb2ff4"
+    },
+    {
+      "repo": "shastri211/knavis",
+      "date": "2026-10-02T15:43:16Z",
+      "message": "Phase 4: accounts, upload safety, interface, Docker, evaluation set (#4)",
+      "url": "https://github.com/shastri211/knavis/commit/5cf198b098df102de58e66d3bdc92413ca78dafc"
+    }
+  ]
+}

@@ -1,0 +1,111 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Icon from '@/components/ui/Icon.astro';
+import { formatMonth, statusLabel } from '@/lib/case-study';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+const { data } = project;
+---
+
+<li class="row">
+  <a href={`/work/${project.id}/`}>
+    <span class="when label">{formatMonth(data.period.start)}</span>
+    <span class="body">
+      <span class="title">{data.title}</span>
+      <span class="line">{data.tagline}</span>
+    </span>
+    <span class="meta label">
+      <span>{statusLabel[data.status]}</span>
+      <span class="stack">
+        {data.stack
+          .flatMap((g) => g.items)
+          .slice(0, 4)
+          .join(', ')}
+      </span>
+    </span>
+    <Icon class="go" name="arrow-right" size={16} />
+  </a>
+</li>
+
+<style>
+  .row {
+    list-style: none;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  a {
+    display: grid;
+    gap: var(--s-1) var(--gap);
+    padding-block: var(--s-5);
+    text-decoration: none;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'when go'
+      'body body'
+      'meta meta';
+  }
+
+  .when {
+    grid-area: when;
+  }
+  .body {
+    grid-area: body;
+    display: grid;
+    gap: var(--s-1);
+  }
+  .meta {
+    grid-area: meta;
+    display: grid;
+    gap: 0;
+    margin-top: var(--s-2);
+  }
+  .go {
+    grid-area: go;
+    align-self: start;
+    color: var(--ink-3);
+    transition:
+      transform var(--t-base) var(--ease),
+      color var(--t-fast) var(--ease);
+  }
+
+  .title {
+    font-size: var(--step-2);
+    line-height: 1.2;
+  }
+
+  .line {
+    max-width: 58ch;
+    color: var(--ink-2);
+    font-size: 1.0625rem;
+    line-height: 1.45;
+  }
+
+  a:hover .title {
+    color: var(--accent);
+  }
+
+  a:hover .go {
+    color: var(--accent);
+    transform: translateX(4px);
+  }
+
+  @media (min-width: 60rem) {
+    a {
+      grid-template-columns: 9rem minmax(0, 1fr) 14rem 1.5rem;
+      grid-template-areas: 'when body meta go';
+      align-items: baseline;
+      padding-block: var(--s-5);
+    }
+    .meta {
+      margin-top: 0;
+    }
+    .stack {
+      display: block;
+      margin-top: var(--s-1);
+    }
+  }
+</style>
