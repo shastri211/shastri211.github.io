@@ -20,12 +20,7 @@ const { data } = project;
     </span>
     <span class="meta label">
       <span>{statusLabel[data.status]}</span>
-      <span class="stack">
-        {data.stack
-          .flatMap((g) => g.items)
-          .slice(0, 4)
-          .join(', ')}
-      </span>
+      <span class="stack">{data.highlights.join(', ')}</span>
     </span>
     <Icon class="go" name="arrow-right" size={16} />
   </a>

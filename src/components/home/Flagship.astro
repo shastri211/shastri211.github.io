@@ -39,12 +39,7 @@ const href = `/work/${project.id}/`;
       )}
     </div>
 
-    <p class="stack label">
-      {data.stack
-        .flatMap((g) => g.items)
-        .slice(0, 8)
-        .join(' · ')}
-    </p>
+    <p class="stack label">{data.highlights.join(' · ')}</p>
 
     <p class="links">
       <a class="btn" href={href}>

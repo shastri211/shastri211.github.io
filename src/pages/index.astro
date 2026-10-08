@@ -9,16 +9,13 @@ import { journey } from '@/data/profile';
 import { hasResume } from '@/lib/resume';
 import { byOrder } from '@/lib/case-study';
 import { getActivity } from '@/lib/github-activity';
+import { groupSkills } from '@/lib/skills';
 
 const projects = (await getCollection('projects', (p) => !p.data.draft)).sort(byOrder);
 const flagships = projects.filter((p) => p.data.kind === 'flagship');
 const others = projects.filter((p) => p.data.kind !== 'flagship');
 
-const skills = await getCollection('skills');
-const groups = new Map<string, string[]>();
-for (const s of skills) {
-  groups.set(s.data.group, [...(groups.get(s.data.group) ?? []), s.data.name]);
-}
+const groups = groupSkills(await getCollection('skills'));
 
 const experience = (await getCollection('experience'))[0];
 const activity = await getActivity();
@@ -84,7 +81,7 @@ const jsonLd = {
 
     <dl class="col-main now">
       <div>
-        <dt class="label label--caps">Working on</dt>
+        <dt class="label label--caps">Latest commit</dt>
         <dd>
           {activity.items[0] ? (
             <a href={activity.items[0].url} rel="noopener">
@@ -160,10 +157,10 @@ const jsonLd = {
     </div>
     <div class="col-main">
       <dl class="skills">
-        {[...groups.entries()].map(([group, names]) => (
+        {groups.map(({ group, items }) => (
           <div>
             <dt class="label">{group}</dt>
-            <dd>{names.join(', ')}</dd>
+            <dd>{items.map((s) => s.data.name).join(', ')}</dd>
           </div>
         ))}
       </dl>

@@ -11,8 +11,12 @@
     "group": "Languages",
     "usedIn": ["hiring-automation", "knavis", "recruitai"]
   },
-  { "id": "sql", "name": "SQL", "group": "Languages", "usedIn": ["hiring-automation", "knavis"] },
-
+  {
+    "id": "sql",
+    "name": "SQL",
+    "group": "Languages",
+    "usedIn": ["hiring-automation", "knavis"]
+  },
   {
     "id": "fastapi",
     "name": "FastAPI",
@@ -56,7 +60,6 @@
     "group": "Backend",
     "usedIn": ["hiring-automation", "knavis", "retainai"]
   },
-
   {
     "id": "hybrid-retrieval",
     "name": "Hybrid retrieval (keyword plus dense, rank fusion)",
@@ -100,9 +103,18 @@
     "usedIn": ["hiring-automation"],
     "note": "An integration. I did not build speech recognition or synthesis."
   },
-
-  { "id": "sklearn", "name": "scikit-learn", "group": "Data and ML", "usedIn": ["retainai"] },
-  { "id": "pandas", "name": "pandas and NumPy", "group": "Data and ML", "usedIn": ["retainai"] },
+  {
+    "id": "sklearn",
+    "name": "scikit-learn",
+    "group": "Data and ML",
+    "usedIn": ["retainai"]
+  },
+  {
+    "id": "pandas",
+    "name": "pandas and NumPy",
+    "group": "Data and ML",
+    "usedIn": ["retainai"]
+  },
   {
     "id": "validation",
     "name": "Grouped cross-validation, calibration and ablations",
@@ -115,7 +127,6 @@
     "group": "Data and ML",
     "usedIn": ["retainai"]
   },
-
   {
     "id": "postgres",
     "name": "PostgreSQL",
@@ -128,9 +139,18 @@
     "group": "Datastores",
     "usedIn": ["hiring-automation", "knavis"]
   },
-  { "id": "redis", "name": "Redis", "group": "Datastores", "usedIn": ["hiring-automation"] },
-  { "id": "sqlite-fts5", "name": "SQLite and FTS5", "group": "Datastores", "usedIn": ["knavis"] },
-
+  {
+    "id": "redis",
+    "name": "Redis",
+    "group": "Datastores",
+    "usedIn": ["hiring-automation"]
+  },
+  {
+    "id": "sqlite-fts5",
+    "name": "SQLite and FTS5",
+    "group": "Datastores",
+    "usedIn": ["knavis"]
+  },
   {
     "id": "react",
     "name": "React",
@@ -155,7 +175,6 @@
     "group": "Frontend",
     "usedIn": ["hiring-automation", "knavis", "recruitai"]
   },
-
   {
     "id": "docker",
     "name": "Docker and Docker Compose",
@@ -173,5 +192,23 @@
     "name": "nginx",
     "group": "Infrastructure and tooling",
     "usedIn": ["hiring-automation", "knavis"]
+  },
+  {
+    "id": "astro",
+    "name": "Astro and MDX",
+    "group": "Frontend",
+    "usedIn": ["portfolio"]
+  },
+  {
+    "id": "css",
+    "name": "Modern CSS (custom properties, container queries, light-dark)",
+    "group": "Frontend",
+    "usedIn": ["portfolio"]
+  },
+  {
+    "id": "a11y",
+    "name": "Accessibility testing (axe-core, contrast checks)",
+    "group": "Frontend",
+    "usedIn": ["portfolio"]
   }
 ]

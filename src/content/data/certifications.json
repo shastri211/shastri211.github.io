@@ -4,16 +4,14 @@
     "title": "Certified AI-Driven Professional, AI Career Accelerator Inner Circle Program",
     "issuer": "Be10x",
     "issued": "2026-01-23",
-    "kind": "program",
-    "note": "A prompt-engineering and AI-tooling programme. It shows I completed it; it says little about engineering depth, which the case studies cover."
+    "kind": "program"
   },
   {
     "id": "ibm-getting-started-with-data",
     "title": "Getting Started with Data",
     "issuer": "IBM SkillsBuild",
     "issued": "2026-01-29",
-    "kind": "course",
-    "verifyUrl": "https://skills.yourlearning.ibm.com/certificate/PLAN-14F2691E3A32"
+    "kind": "course"
   },
   {
     "id": "deloitte-data-analytics",
@@ -28,8 +26,7 @@
     "title": "Data Fundamentals",
     "issuer": "IBM SkillsBuild",
     "issued": "2026-02-13",
-    "kind": "course",
-    "verifyUrl": "https://skills.yourlearning.ibm.com/certificate/PLAN-BC0FAEE8E439"
+    "kind": "course"
   },
   {
     "id": "bcg-x-data-for-decision-makers",

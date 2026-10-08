@@ -42,6 +42,8 @@ const projects = defineCollection({
       .array(z.object({ name: z.string(), contribution: z.string(), url: z.url().optional() }))
       .default([]),
     stack: z.array(z.object({ group: z.string(), items: z.array(z.string()).min(1) })),
+    /** The few technologies that distinguish the project, shown in lists. */
+    highlights: z.array(z.string()).min(2).max(5),
     links: z.object({
       repo: z.url().optional(),
       demo: z.url().optional(),

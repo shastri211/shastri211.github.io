@@ -5,16 +5,14 @@ import Icon from '@/components/ui/Icon.astro';
 import { education } from '@/data/profile';
 import { site } from '@/data/site';
 import { formatMonth } from '@/lib/case-study';
+import { groupSkills } from '@/lib/skills';
 
 const projects = new Map((await getCollection('projects')).map((p) => [p.id, p.data.title]));
 const experience = await getCollection('experience');
 const certifications = (await getCollection('certifications')).sort((a, b) =>
   b.data.issued.localeCompare(a.data.issued),
 );
-const skills = await getCollection('skills');
-
-const groups = new Map<string, typeof skills>();
-for (const s of skills) groups.set(s.data.group, [...(groups.get(s.data.group) ?? []), s]);
+const groups = groupSkills(await getCollection('skills'));
 
 const longDate = new Intl.DateTimeFormat('en-GB', {
   day: 'numeric',
@@ -145,7 +143,7 @@ const longDate = new Intl.DateTimeFormat('en-GB', {
         A technology is listed only if a project on this site used it, and the projects are linked.
         There are no ratings.
       </p>
-      {[...groups.entries()].map(([group, items]) => (
+      {groups.map(({ group, items }) => (
         <section class="sk-group" aria-label={group}>
           <h3 class="label label--caps">{group}</h3>
           <ul>
