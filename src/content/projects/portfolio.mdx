@@ -130,12 +130,6 @@ Architecture diagrams are real HTML lists styled as a staged flow, not images. T
 
 <Section id="challenges" title="Challenges">
 
-<Note label="Claims that did not survive checking">
-
-Content review caught several things before they reached the page. An early audit quoted RetainAI figures from an unpushed branch, and the report that a visitor can actually open has different numbers: holdout ROC-AUC 0.863, not 0.849. An architecture document in KNAVIS lists a reranking step that the code does not have. A resume line about Hugging Face translation had no matching code. Each was removed or corrected to match the evidence.
-
-</Note>
-
 <Note label="Verification links that required a login">
 
 The link checker found that both IBM certificate links redirect an anonymous visitor to a sign-in page. A link labelled "Verify" that cannot be used to verify is worse than no link, so they were removed.
