@@ -48,7 +48,7 @@ metrics:
     value: 395 test functions in 36 files, run in CI on SQLite and on PostgreSQL
     source: backend/tests/
     sourceUrl: https://github.com/shastri211/knavis/tree/c2a5d35272ab0e7ee68199ae2a1007ce5869cc26/backend/tests
-    caveat: Counted from test function declarations. I have not measured coverage.
+    caveat: Counted from test function declarations. Coverage has not been measured.
 evidence:
   - claim: The agent is a LangGraph state graph, from supervisor and guardrails to greeting, utility, document or blocked paths.
     proof: backend/app/agent_graph/graph.py, lines 8 to 40
@@ -320,7 +320,7 @@ Each claim links to the file and lines at the pinned commit.
 
 <Section id="reflection" title="Reflection">
 
-If I rebuilt it today:
+Open work suggested by the evidence above:
 
 - **Try the dense score as a second gate signal.** It is the next thing the evaluation notes name, and it needs an embedding provider to test. It might separate the look-alike questions the lexical gate cannot.
 - **Add a real reranker, or stop listing one.** The pipeline fuses and gates but does not rerank. A cross-encoder would be a measurable change against the evaluation set.

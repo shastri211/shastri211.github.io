@@ -39,7 +39,7 @@ export const journey: JourneyStep[] = [
   {
     when: 'Nov 2025',
     title: 'Sahaay, a rule-based support chatbot',
-    body: 'A Flask chatbot for English, Hindi and Hinglish conversations. My first conversational system. Not published, so there is no case study.',
+    body: 'A Flask chatbot for English, Hindi and Hinglish conversations. Its working code is not in a public repository, so there is no case study.',
   },
   {
     when: 'Jan – Feb 2026',

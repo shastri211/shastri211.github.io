@@ -198,7 +198,7 @@ Runtime dependencies are pinned to exact versions. Reports record the dataset's 
 
 <Section id="challenges" title="Challenges">
 
-<Note label="Correcting my own Phase 0 findings, 6 Oct 2026 (fefe4ae)">
+<Note label="Correcting the Phase 0 findings, 6 Oct 2026 (fefe4ae)">
 
 Checking the data properly in Phase 1 showed that three statements from the discovery phase were over-stated. Two-year contracts with fewer than 24 months of tenure are plausible, not inconsistent. The duplicate groups all sit at tenure 1, which explains them and makes them harmless to group. And a survival-based customer lifetime value cannot be validated on a single snapshot with an undefined churn horizon. The corrections are recorded as D-18 in the decision log instead of being edited out of the earlier documents.
 
@@ -278,9 +278,9 @@ Each claim links to the file at the pinned commit. The pinned commit is the code
 
 <Section id="reflection" title="Reflection">
 
-If I continued it today:
+Open work suggested by the evidence above:
 
-- **Put the tests in CI.** 142 tests run only on my machine. A workflow that runs them, and the slow reproducibility test on a schedule, is the cheapest credibility gain available.
+- **Put the tests in CI.** The 142 tests run locally only. A workflow that runs them, and the slow reproducibility test on a schedule, is the cheapest credibility gain available.
 - **Put intervals on the holdout.** The cross-validated figures have deviations; the holdout metrics are single numbers from one fold.
 - **Say which evidence tier each later phase will claim.** The roadmap's MVP runs on assumed effects, and uplift waits for a data-strategy decision. Writing that tier onto every output, as the Phase 1 reports already do with their provenance label, keeps assumed effects from being read as measured ones.
 - **Resolve the dataset's redistribution terms.** The sample is committed to the repository, and its terms and the repository's licence file are both unsettled.

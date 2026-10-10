@@ -54,7 +54,7 @@ My part was the web application on top of it: a dashboard for the recruiter and 
 
 <Section id="approach" title="Approach">
 
-I worked under one constraint: leave the pipeline alone. The first pull request added two new top-level folders and modified no existing file. One was a thin FastAPI layer that calls the same database and pipeline functions the Streamlit dashboard already called. The other was a React frontend over that layer, covering the same functions plus a self-service portal for candidates.
+The first pull request added two new top-level folders and modified no existing file. One was a thin FastAPI layer that calls the same database and pipeline functions the Streamlit dashboard already called. The other was a React frontend over that layer, covering the same functions plus a self-service portal for candidates.
 
 A later pull request added a second frontend, `frontend-v2`, beside the first instead of replacing it, so the working one stayed untouched while the new one was built.
 
@@ -91,7 +91,7 @@ Two frontends and an API layer, all merged into the collaborator's repository, r
 
 <Section id="evidence" title="Evidence">
 
-The repository belongs to my collaborator and is not linked from this page. The pull requests below are the record of my part, and I am glad to walk through them.
+The repository belongs to my collaborator and is not linked from this page. The pull requests below are the record of my part.
 
 <EvidenceList items={frontmatter.evidence} />
 

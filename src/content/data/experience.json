@@ -11,6 +11,6 @@
       "Contributed to an AI hiring-automation platform: resume parsing, candidate profiling, Qdrant-based semantic matching, automated screening and interview workflows."
     ],
     "stack": ["Python", "FastAPI", "PostgreSQL", "Redis Streams", "Qdrant", "Docker"],
-    "note": "The code from this role is not public and is not linked here. My own Hiring Automation project is a separate repository and is not presented as company work."
+    "note": "The code from this role is not public and is not linked here."
   }
 ]

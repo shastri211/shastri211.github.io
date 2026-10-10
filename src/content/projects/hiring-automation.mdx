@@ -36,7 +36,7 @@ metrics:
     value: 439 test functions in 45 files
     source: backend/tests/
     sourceUrl: https://github.com/shastri211/Hiring_Automation/tree/d99bc2bb6794a173afbeb374ad628d1cae6273ff/backend/tests
-    caveat: Counted from test function declarations. I have not measured coverage, so this shows how much testing exists, not how much of the code it exercises.
+    caveat: Counted from test function declarations. Coverage has not been measured, so this shows how much testing exists, not how much of the code it exercises.
   - label: Schema migrations
     value: 34 Alembic revisions
     source: backend/alembic/versions/
@@ -77,8 +77,8 @@ evidence:
     href: https://github.com/shastri211/Hiring_Automation/blob/d99bc2bb6794a173afbeb374ad628d1cae6273ff/README.md#L74-L84
 notClaimed:
   - It is not deployed. It runs locally with Docker Compose; there is no live demo and no production user.
-  - I have not measured throughput, latency, screening accuracy or time saved, so none are quoted.
-  - I have not compared its SHORTLIST, REVIEW and REJECT decisions with human reviewers, so I make no claim about their quality.
+  - No measurements of throughput, latency, screening accuracy or time saved exist in the repository, so none are quoted.
+  - Its SHORTLIST, REVIEW and REJECT decisions have not been compared with human reviewers, so no claim is made about their quality.
   - The voice interview is an integration with Dograh, an open-source voice-agent platform. I did not build speech recognition, speech synthesis or the call engine.
 ---
 
@@ -312,7 +312,7 @@ What does not exist yet is any measurement of how good the screening is. See the
 
 <Section id="evidence" title="Evidence">
 
-Each claim below links to the file and lines at the pinned commit, so the links keep pointing at what I describe even after the repository changes.
+Each claim below links to the file and lines at the pinned commit, so the links keep pointing at what this page describes even after the repository changes.
 
 <EvidenceList items={frontmatter.evidence} />
 
@@ -322,11 +322,11 @@ Each claim below links to the file and lines at the pinned commit, so the links 
 
 <Section id="reflection" title="Reflection">
 
-If I rebuilt it today:
+Open work suggested by the evidence above:
 
 - **Classify provider errors by type, not by text.** The fallback decides whether an error is transient by checking whether the message contains the characters `50` or `400` (`llm_provider.py`, lines 400 to 404). A message that merely contains those digits would be misclassified. Provider exceptions should carry a status code.
 - **Share cooldown state.** Model cooldowns live in an in-process dictionary (`model_registry.py`, lines 30 and 31), so each worker process learns separately that a model is rate-limited. Redis would let them share it.
-- **Measure before tuning.** The gate defaults came from judgement. A small labelled set of resumes with human decisions would let me tune the threshold and report precision and recall, which is the number this project most needs.
+- **Measure before tuning.** The gate defaults have not been tuned against labelled data. A small labelled set of resumes with human decisions would allow the threshold to be tuned and precision and recall to be reported, which are the figures this project lacks.
 - **Write the architecture down.** The README explains how to run the project but not why it is shaped this way. This page is the first place that is written.
 - **Capture screenshots and a short demo.** None exist yet.
 
